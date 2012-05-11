@@ -1,4 +1,4 @@
-PROGRAM = delta
+PROGRAM = aelta
 
 SOURCES = $(PROGRAM).c
 CC = $(ARCH)gcc

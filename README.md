@@ -1,4 +1,9 @@
 deltabotsim
 ===========
 
-An OpenGL Delta robot simulator
+	/*|_|_|_ __ ___ | | ___ __|_|_ __  ___ 
+	| _|| | '_ ` _ \| |/ / '__|@|a'_ \/ __|
+	| |_| | | | | | |   <| |  |g|i| | \__ \
+	 \__|_|_| |_| |_|_|\_\_|  |m|l| |_|__*/
+ 
+ An OpenGL Delta robot simulator
