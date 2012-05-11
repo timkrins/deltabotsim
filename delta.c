@@ -1,0 +1,204 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <GL/glfw.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <GL/glext.h>
+#include <math.h>
+
+//define constants
+const int window_width = 1300, window_height = 600;
+const int fs_window_width = 1366, fs_window_height = 768;
+#define PI 3.14159265
+
+#define SIN60 0.866025404
+#define SIN180 0
+#define SIN300 -0.866025404
+#define COS60 0.5
+#define COS180 -1
+#define COS300 0.5
+
+#define TOP_PLAT_DIST 10.0f
+#define TOP_PLAT_THICK 3.0f
+
+GLubyte rasters[24] = {
+   0xc0, 0x00, 0xc0, 0x00, 0xc0, 0x00, 0xc0, 0x00, 0xc0, 0x00,
+   0xff, 0x00, 0xff, 0x00, 0xc0, 0x00, 0xc0, 0x00, 0xc0, 0x00,
+   0xff, 0xc0, 0xff, 0xc0};
+
+//define variables
+float squaresize = 0.3;
+int xMouse, yMouse, h;
+float yrot, xrot;
+float speedmin  = 0.15f;
+float speedmulti = 0.05f;
+float c_red = 0.1f, c_green = 0.1f, c_blue = 0.1f;
+
+//define delta static vars
+
+static float top_arm_len = 20.0f;
+static float bot_arm_len = 30.0f;
+static float bot_plat_dist = 10.0f; // the bottom platform distance from center point
+
+float top_v_2[6][3] =
+{
+{TOP_PLAT_DIST*SIN180, 0.0f, COS180*TOP_PLAT_DIST},
+{TOP_PLAT_DIST*SIN60,0.0f,COS60*TOP_PLAT_DIST},
+{TOP_PLAT_DIST*SIN300,0.0f,COS300*TOP_PLAT_DIST},
+{TOP_PLAT_DIST*SIN180, 0.0f-TOP_PLAT_THICK, COS180*TOP_PLAT_DIST},
+{TOP_PLAT_DIST*SIN60,0.0f-TOP_PLAT_THICK,COS60*TOP_PLAT_DIST},
+{TOP_PLAT_DIST*SIN300,0.0f-TOP_PLAT_THICK,COS300*TOP_PLAT_DIST}
+};
+
+//define delta dynamic vars
+float servo_1 = 25.0f;
+float servo_2 = 25.0f;
+float servo_3 = 25.0f;
+
+//protyping
+void major_loop(void);
+void quit(void);
+void init_arrays(void);
+void draw_top_plat(void);
+void graphics_init(void);
+void graphics_draw(void);
+
+void quit(void)
+{
+  glfwTerminate();
+  exit(0);
+}//end-of-quit
+
+void graphics_init(void) {
+  if (glfwInit() != GL_TRUE) {
+    quit();
+  }
+  glfwOpenWindowHint( GLFW_FSAA_SAMPLES, 4);
+  if(glfwOpenWindow( window_width,window_height,8,8,8,8,24,8,GLFW_WINDOW ) != GL_TRUE) {
+    quit();
+  }
+  glfwOpenWindowHint( GLFW_FSAA_SAMPLES, 4);
+  glEnable( GL_MULTISAMPLE );
+  glEnable (GL_BLEND);
+  glEnable( GL_DEPTH_TEST ) ;
+  //glBlendFunc(GL_SRC_ALPHA,GL_ONE);
+  glfwSetWindowTitle("Delta Robot Simulator by Tim K");
+  glMatrixMode(GL_PROJECTION);
+  glPolygonMode(GL_FRONT, GL_FILL);
+//glPolygonMode(GL_BACK, GL_LINE);
+  glLoadIdentity();
+  float aspect_ratio = ((float)window_height) / window_width;
+  glFrustum(.5, -.5, -.5 * aspect_ratio, .5 * aspect_ratio, 1, 300);
+  glMatrixMode(GL_MODELVIEW);
+  glClearColor( 0.05f, 0.05f, 0.05f, 0.0f ); // Preset color
+}//end-of-graphics-initialise
+
+
+void draw_top_plat(void) {  // Draws the top platform
+  glBegin(GL_TRIANGLES);
+  {    //glColor3f(c_red, c_green, c_blue);
+   glColor4f(0,0,0,0);
+   glColor3f(.5f, .1f, .2f);
+   
+   glVertex3f(top_v_2[0][0],top_v_2[0][1],top_v_2[0][2]); //1,2,3
+  glVertex3f(top_v_2[1][0],top_v_2[1][1],top_v_2[1][2]);
+glVertex3f(top_v_2[2][0],top_v_2[2][1],top_v_2[2][2]);
+   glColor3f(.3f, .7f, .3f);
+   glVertex3f(top_v_2[0][0],top_v_2[0][1],top_v_2[0][2]); //1,5,2
+   glVertex3f(top_v_2[4][0],top_v_2[4][1],top_v_2[4][2]);
+   glVertex3f(top_v_2[1][0],top_v_2[1][1],top_v_2[1][2]);
+   glColor3f(.5f, .3f, .8f);
+   glVertex3f(top_v_2[0][0],top_v_2[0][1],top_v_2[0][2]); //1,4,5
+   glVertex3f(top_v_2[3][0],top_v_2[3][1],top_v_2[3][2]);
+   glVertex3f(top_v_2[4][0],top_v_2[4][1],top_v_2[4][2]);
+   glColor3f(.5f, .7f, .8f);
+   glVertex3f(top_v_2[1][0],top_v_2[1][1],top_v_2[1][2]); //2,5,6
+   glVertex3f(top_v_2[4][0],top_v_2[4][1],top_v_2[4][2]);
+   glVertex3f(top_v_2[5][0],top_v_2[5][1],top_v_2[5][2]);
+   glColor3f(.7f, .7f, .8f);
+   glVertex3f(top_v_2[1][0],top_v_2[1][1],top_v_2[1][2]); //2,3,6
+   glVertex3f(top_v_2[5][0],top_v_2[5][1],top_v_2[5][2]);
+      glVertex3f(top_v_2[2][0],top_v_2[2][1],top_v_2[2][2]);
+   glColor3f(.5f, .1f, .8f);
+   glVertex3f(top_v_2[2][0],top_v_2[2][1],top_v_2[2][2]); //3,4,6
+   glVertex3f(top_v_2[5][0],top_v_2[5][1],top_v_2[5][2]);
+      glVertex3f(top_v_2[3][0],top_v_2[3][1],top_v_2[3][2]);
+   glColor3f(.5f, .7f, .3f);
+   glVertex3f(top_v_2[2][0],top_v_2[2][1],top_v_2[2][2]); //3,4,1
+   glVertex3f(top_v_2[3][0],top_v_2[3][1],top_v_2[3][2]);
+   glVertex3f(top_v_2[0][0],top_v_2[0][1],top_v_2[0][2]);
+   glColor3f(.5f, .6f, .6f);
+   glVertex3f(top_v_2[4][0],top_v_2[4][1],top_v_2[4][2]);
+   glVertex3f(top_v_2[3][0],top_v_2[3][1],top_v_2[3][2]);
+   glVertex3f(top_v_2[5][0],top_v_2[5][1],top_v_2[5][2]);
+  }
+  glEnd();
+}//end-of-draw-top-plat
+
+void draw_machine(void) {  // Draws a square with a gradient color at coordinates 0, 10
+  glBegin(GL_QUADS);
+  {
+    glColor3f(c_red, c_green, c_blue*3);
+    glVertex3f(-10, -10, -1.5);
+    glVertex3f(10, -10, -1.5);
+    glColor3f(0.1,0.9,0.9);
+    glVertex3f(10, 10, -1.5);
+    glVertex3f(-10, 10, -1.5);
+  }
+  glEnd();
+}//end-of-drawing-the-back
+
+void graphics_draw(void) {
+    glLoadIdentity();
+   	glTranslatef(0, 0, -70);  // move view back a bit 
+    glfwGetMousePos(&xMouse,&yMouse);
+    gluLookAt(
+    (double)(xMouse-(window_width/2))/20, (double)(yMouse-(window_height/2))/20, 12, // look from
+		0, 0, 0, // look here
+		0.0f, 1.0f, 0.0f); // up matrix
+		
+		glPushMatrix();
+		//draw things here
+    draw_top_plat();
+    //draw_machine();
+    //end drawing things
+    glPopMatrix();
+    
+    glColor3f(1.0, 1.0, 1.0);
+    glRasterPos3f(top_v_2[0][0],top_v_2[0][1],top_v_2[0][2]);
+    glBitmap(50, 60, 0.0, 0.0, 11.0, 0.0, rasters);
+    glRasterPos3f(top_v_2[1][0],top_v_2[1][1],top_v_2[1][2]);
+    glBitmap(10, 12, 0.0, 0.0, 11.0, 0.0, rasters);
+    glRasterPos3f(top_v_2[2][0],top_v_2[2][1],top_v_2[2][2]);
+    glBitmap(10, 12, 0.0, 0.0, 11.0, 0.0, rasters);
+    glFlush();
+    
+   // glPushMatrix();
+   // //draw next item
+    //glTranslatef(1.2,1.2,0);
+    ////draw_bot_plat(0.5f);
+    ////end drawing next item
+    //glPopMatrix();
+}//end-of-graphics-draw
+
+void major_loop(void) {
+double old_time = glfwGetTime();
+while(glfwGetWindowParam(GLFW_ACTIVE))
+  {
+  double current_time = glfwGetTime();
+  glfwSleep(0.02);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  graphics_draw();
+  glfwSwapBuffers();
+  }
+}//end-of-major-loop
+
+int main(void)
+{
+  //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  graphics_init();
+  major_loop();
+  quit();
+
+}//end-of-main
