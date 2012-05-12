@@ -24,29 +24,45 @@ void graphics_draw(void);
 void graphics_loop(void);
 
 // prototype various drawing functions
+
 void draw_text_layers(void);
 void draw_delta_robot(void);
   void draw_top_base(void);
     void draw_topbase_full_top(void);
-    void draw_topbase_onethird_sides(void);
-    void draw_topbase_onethird_motors(void);
+    void draw_topbase_full_sides(void);
+      void draw_topbase_onethird_sides(void);
+    void draw_topbase_full_motors(void);
+      void draw_topbase_onethird_motors(void);
     void draw_topbase_full_bottom(void);
   void draw_bottom_base(void);
     void draw_botbase_full_top(void);
-    void draw_botbase_onethird_sides(void);
+    void draw_botbase_full_sides(void);
+      void draw_botbase_onethird_sides(void);
     void draw_botbase_full_bottom(void);
   void draw_arms(void);
     void draw_arms_top_full_motor_joiner(void);
     void draw_arms_top_full_arm(void);
     void draw_arms_mid_full_joiner(void);
-    void draw_arms_bottom_onehalf_arm(void);
+    void draw_arms_bottom_full_arms(void);
+      void draw_arms_bottom_onehalf_arms(void);
     void draw_arms_bottom_full_joiner(void);
 
-//define constants
+//  define constants
+
 const int window_width = 1300, window_height = 600;
 const int fs_window_width = 1366, fs_window_height = 768;
 
+#define SIN60 0.866025404
+#define SIN180 0
+#define SIN300 -0.866025404
+#define COS60 0.5
+#define COS180 -1
+#define COS300 0.5
+#define SQRT3ON3 0.577350269
+#define SQRT3ON6 0.288675135
+
 // set up software variables
+
 int xMouse, yMouse, h;
 float colors[4];
 char sprinter[15];
@@ -60,7 +76,8 @@ GLint nsides, rings;
 float robot_top_platform_triangle_radius = 10.0f;
 float robot_top_platform_thickness = 3.0f;
 float robot_top_motor_height = 10.0f;
-float robot_top_motor_width = 10.0f;
+float robot_top_motor_width = 6.0f;
+float robot_top_motor_gapfromzero = 1.0f;
 float robot_top_arm_length = 20.0f;
 float robot_top_arm_height = 5.0f;
 float robot_top_arm_width = 5.0f;
@@ -70,14 +87,26 @@ float robot_angle_one = 20.0f;
 float robot_angle_two = 40.0f;
 float robot_angle_three = 60.0f;
 
+float robot_top_platform_triangle_v1_x;
+float robot_top_platform_triangle_v1_y;
+float robot_top_platform_triangle_v1_z;
+float robot_top_platform_triangle_v2_x;
+float robot_top_platform_triangle_v2_y;
+float robot_top_platform_triangle_v2_z;
+float robot_top_platform_triangle_v3_x;
+float robot_top_platform_triangle_v3_y;
+float robot_top_platform_triangle_v3_z;
+float robot_top_platform_triangle_sidelength;
+float robot_top_platform_triangle_inscribed;
+
 // set view variables
 float view_lookat_x = 0.0f;
-float view_lookat_y = -15.0f;
+float view_lookat_y = -5.0f;
 float view_lookat_z = 0.0f;
-float view_lookfrom_divide_x = 10.0f;
-float view_lookfrom_divide_y = 10.0f;
+float view_lookfrom_divide_x = -5.0f;
+float view_lookfrom_divide_y = 5.0f;
 float view_lookfrom_x = 0.0f;
-float view_lookfrom_y = -10.0f;
+float view_lookfrom_y = 0.0f;
 float view_lookfrom_z = 12.0f;
 
 // set up bitmap font
@@ -180,6 +209,24 @@ GLubyte bitmap_font[][13] = {
 {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x8f, 0xf1, 0x60, 0x00, 0x00, 0x00} 
 };
 
+void variables_init(void){
+robot_top_platform_triangle_v1_x = robot_top_platform_triangle_radius*SIN180;
+robot_top_platform_triangle_v1_y = 0.0f;
+robot_top_platform_triangle_v1_z = robot_top_platform_triangle_radius*COS180;
+
+robot_top_platform_triangle_v2_x = robot_top_platform_triangle_radius*SIN60;
+robot_top_platform_triangle_v2_y = 0.0f;
+robot_top_platform_triangle_v2_z = robot_top_platform_triangle_radius*COS60;
+
+robot_top_platform_triangle_v3_x = robot_top_platform_triangle_radius*SIN300;
+robot_top_platform_triangle_v3_y = 0.0f;
+robot_top_platform_triangle_v3_z = robot_top_platform_triangle_radius*COS300;
+
+robot_top_platform_triangle_sidelength = robot_top_platform_triangle_radius / SQRT3ON3;
+robot_top_platform_triangle_inscribed = sqrt((robot_top_platform_triangle_radius*robot_top_platform_triangle_radius)-((robot_top_platform_triangle_sidelength/2)*(robot_top_platform_triangle_sidelength/2)));
+
+};
+
 GLint fontOffset;
 
 void makeBitmapFonts(void)
@@ -215,6 +262,7 @@ void graphics_init(void) {
   glfwSetWindowTitle("Delta Robot Simulator by Tim K");
   glMatrixMode(GL_PROJECTION);
   glPolygonMode(GL_FRONT, GL_FILL);
+  glPolygonMode(GL_BACK, GL_FILL);
   glLoadIdentity();
   float aspect_ratio = ((float)window_height) / window_width;
   glFrustum(.5, -.5, -.5 * aspect_ratio, .5 * aspect_ratio, 1, 500);
@@ -237,7 +285,8 @@ void graphics_draw(void) {
     glLoadIdentity();
    	glTranslatef(0, 0, 0);  // View scrolls with MouseWheel
     glfwGetMousePos(&xMouse,&yMouse); // get the mouse position
-    gluLookAt((double)(((xMouse-(window_width/2))/view_lookfrom_divide_x)+view_lookfrom_x),
+    gluLookAt(
+    (double)(((xMouse-(window_width/2))/view_lookfrom_divide_x)+view_lookfrom_x),
     (double)(((yMouse-(window_height/2))/view_lookfrom_divide_y)+view_lookfrom_y),
     ((((glfwGetMouseWheel()*glfwGetMouseWheel())/5)*(glfwGetMouseWheel()*0.1))-70),
     view_lookat_x, view_lookat_y, view_lookat_z, 0.0f, 1.0f, 0.0f);
@@ -247,7 +296,8 @@ void graphics_draw(void) {
     //###################################################
 
 
-
+    draw_delta_robot();
+    draw_text_layers();
 
 
 
@@ -260,7 +310,7 @@ void graphics_draw(void) {
 void graphics_loop(void) {
   while(glfwGetWindowParam(GLFW_ACTIVE))
   {
-  glfwSleep(0.05);
+  glfwSleep(0.01);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   graphics_draw();
   glfwSwapBuffers();
@@ -269,8 +319,214 @@ void graphics_loop(void) {
 
 int main(void)
 {
+  variables_init();
   graphics_init();
   graphics_loop();
   quit();
   
 }//end-of-main
+
+void draw_text_layers(void){
+    glColor3f(0.3, 0.3, 0.3);
+    glRasterPos3f(0,7,0);    printString("OpenGL Delta Robot Simulator");
+    glColor3f(0.5, 0.5, 0.5);
+    glRasterPos3f(0,6,0);   printString("(c) 2012 TimKrins");
+    glColor3f(0.7, 0.7, 0.7);
+    glRasterPos3f(0,5,0);   printString("UNFINISHED BUT PRETTY");
+};
+
+void draw_delta_robot(void){
+    draw_top_base();
+    //draw_bottom_base();
+    //draw_arms();
+};
+
+void draw_top_base(void){
+    draw_topbase_full_top();
+    draw_topbase_full_sides();
+    draw_topbase_full_motors();
+    //draw_topbase_full_bottom();
+};
+
+void draw_topbase_full_top(void){
+  glPushMatrix();
+  glBegin(GL_TRIANGLES);
+  {
+   glColor3f(.7f, .7f, .7f);
+   glVertex3f(robot_top_platform_triangle_v1_x,robot_top_platform_triangle_v1_y,robot_top_platform_triangle_v1_z);
+   glVertex3f(robot_top_platform_triangle_v2_x,robot_top_platform_triangle_v2_y,robot_top_platform_triangle_v2_z);
+   glVertex3f(robot_top_platform_triangle_v3_x,robot_top_platform_triangle_v3_y,robot_top_platform_triangle_v3_z);
+   }
+  glEnd();
+  glPopMatrix();
+};
+
+void draw_topbase_full_sides(void){
+float startrotation = 0.0f;
+  glPushMatrix();
+  glRotatef(startrotation,0,1,0);
+  glTranslatef(0,0,robot_top_platform_triangle_inscribed);
+  glRotatef(180,0,1,0);
+  draw_topbase_onethird_sides();
+  glPopMatrix();
+  
+  glPushMatrix();
+  glRotatef(120+startrotation,0,1,0);
+  glTranslatef(0,0,robot_top_platform_triangle_inscribed);
+  glRotatef(180,0,1,0);
+  draw_topbase_onethird_sides();
+  glPopMatrix();
+  
+  glPushMatrix();
+  glRotatef(240+startrotation,0,1,0);
+  glTranslatef(0,0,robot_top_platform_triangle_inscribed);
+  glRotatef(180,0,1,0);
+  draw_topbase_onethird_sides();
+  glPopMatrix();
+  
+};
+//(robot_top_platform_triangle_sidelength/2)
+void draw_topbase_onethird_sides(void){
+  glBegin(GL_TRIANGLES);
+  {
+   //first square
+   glColor3f(.2f, .2f, .2f);
+   glVertex3f(0-(robot_top_platform_triangle_sidelength/2),0,0);                             //VERTEX1
+   glVertex3f(0-(robot_top_platform_triangle_sidelength/2),-robot_top_platform_thickness,0); //VERTEX2
+   glVertex3f(robot_top_motor_gapfromzero,0,0);                                              //VERTEX3
+   //glColor3f(.1f, .2f, .8f);
+   glVertex3f(robot_top_motor_gapfromzero,0,0);                                              //VERTEX3
+   glVertex3f(0-(robot_top_platform_triangle_sidelength/2),-robot_top_platform_thickness,0); //VERTEX2
+   glVertex3f(robot_top_motor_gapfromzero,-robot_top_platform_thickness,0);                  //VERTEX4
+   
+   //second square (coming out from z)
+   glColor3f(.3f, .3f, .3f);
+   glVertex3f(robot_top_motor_gapfromzero,0,0);                                              //VERTEX3
+   glVertex3f(robot_top_motor_gapfromzero,-robot_top_platform_thickness,0);                  //VERTEX4
+   glVertex3f(robot_top_motor_gapfromzero,0,-robot_top_motor_width);                         //VERTEX5
+   
+   //glColor3f(.1f, .2f, .8f);
+   glVertex3f(robot_top_motor_gapfromzero,0,-robot_top_motor_width);                         //VERTEX5
+   glVertex3f(robot_top_motor_gapfromzero,-robot_top_platform_thickness,0);                  //VERTEX4
+   glVertex3f(robot_top_motor_gapfromzero,-robot_top_platform_thickness,-robot_top_motor_width); //VERTEX6
+   
+   //third square
+   glColor3f(.4f, .4f, .4f);
+   glVertex3f(robot_top_motor_gapfromzero,0,-robot_top_motor_width);                         //VERTEX5
+   glVertex3f(robot_top_motor_gapfromzero,-robot_top_platform_thickness,-robot_top_motor_width); //VERTEX6
+   glVertex3f((robot_top_platform_triangle_sidelength/2),0,-robot_top_motor_width);          //VERTEX7
+
+
+   //glColor3f(.1f, .2f, .8f);
+   glVertex3f((robot_top_platform_triangle_sidelength/2),0,-robot_top_motor_width);          //VERTEX7
+   glVertex3f(robot_top_motor_gapfromzero,-robot_top_platform_thickness,-robot_top_motor_width); //VERTEX6
+   glVertex3f((robot_top_platform_triangle_sidelength/2),-robot_top_platform_thickness,-robot_top_motor_width); //VERTEX8
+   
+   
+   //fourth square
+   glColor3f(.5f, .5f, .5f);
+   glVertex3f((robot_top_platform_triangle_sidelength/2),0,-robot_top_motor_width);          //VERTEX7
+   glVertex3f((robot_top_platform_triangle_sidelength/2),-robot_top_platform_thickness,-robot_top_motor_width); //VERTEX8
+   glVertex3f((robot_top_platform_triangle_sidelength/2),0,0);          //VERTEX9
+
+   //glColor3f(.1f, .2f, .8f);
+   glVertex3f((robot_top_platform_triangle_sidelength/2),0,0);          //VERTEX9
+   glVertex3f((robot_top_platform_triangle_sidelength/2),-robot_top_platform_thickness,-robot_top_motor_width); //VERTEX8
+   glVertex3f((robot_top_platform_triangle_sidelength/2),-robot_top_platform_thickness,0); //VERTEX10
+   
+   //draw tops
+   glColor3f(.7f, .7f, .7f);
+   glVertex3f((robot_top_platform_triangle_sidelength/2),0,0);          //VERTEX9
+   glVertex3f(robot_top_motor_gapfromzero,0,0);                                              //VERTEX3
+   glVertex3f(robot_top_motor_gapfromzero,0,-robot_top_motor_width);                         //VERTEX5
+
+   glVertex3f((robot_top_platform_triangle_sidelength/2),0,0);          //VERTEX9
+   glVertex3f(robot_top_motor_gapfromzero,0,-robot_top_motor_width);                         //VERTEX5
+   glVertex3f((robot_top_platform_triangle_sidelength/2),0,-robot_top_motor_width);          //VERTEX7
+
+   }
+
+  glEnd();
+};
+
+void draw_topbase_full_motors(void){
+//including attach points for arm
+float startrotation = 0.0f;
+  glPushMatrix();
+  glRotatef(startrotation,0,1,0);
+  glTranslatef(0,0,robot_top_platform_triangle_radius);
+  glColor3f(.5f, .5f, .5f);
+  glRotatef(180,0,1,0);
+  draw_topbase_onethird_motors();
+  glPopMatrix();
+  
+  glPushMatrix();
+  glRotatef(120+startrotation,0,1,0);
+  glTranslatef(0,0,robot_top_platform_triangle_radius);
+  glRotatef(180,0,1,0);
+  draw_topbase_onethird_motors();
+  glPopMatrix();
+  
+  glPushMatrix();
+  glRotatef(240+startrotation,0,1,0);
+  glTranslatef(0,0,robot_top_platform_triangle_radius);
+  glRotatef(180,0,1,0);
+  draw_topbase_onethird_motors();
+  glPopMatrix();
+};
+
+void draw_topbase_onethird_motors(void){
+gluSphere(quadSphere, 1, 32, 16);
+
+
+};
+
+void draw_topbase_full_bottom(void){
+
+};
+
+void draw_bottom_base(void){
+    draw_botbase_full_top();
+    draw_botbase_onethird_sides();
+    draw_botbase_full_bottom();
+};
+
+void draw_botbase_full_top(void){
+
+};
+
+void draw_botbase_onethird_sides(void){
+
+};
+
+void draw_botbase_full_bottom(void){
+
+};
+
+void draw_arms(void){
+    draw_arms_top_full_motor_joiner();
+    draw_arms_top_full_arm();
+    draw_arms_mid_full_joiner();
+    draw_arms_bottom_onehalf_arms();
+    draw_arms_bottom_full_joiner();
+};
+
+void draw_arms_top_full_motor_joiner(void){
+
+};
+
+void draw_arms_top_full_arm(void){
+
+};
+
+void draw_arms_mid_full_joiner(void){
+
+};
+
+void draw_arms_bottom_onehalf_arms(void){
+
+};
+
+void draw_arms_bottom_full_joiner(void){
+
+};
