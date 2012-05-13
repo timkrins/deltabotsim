@@ -55,15 +55,7 @@ void draw_delta_robot(void);
 const int window_width = 1300, window_height = 600;
 const int fs_window_width = 1366, fs_window_height = 768;
 
-#define PION180 0.017453292519943295769
-#define SIN60 0.866025404
-#define SIN180 0
-#define SIN300 -0.866025404
-#define COS60 0.5
-#define COS180 -1
-#define COS300 0.5
-#define SQRT3ON3 0.577350269
-#define SQRT3ON6 0.288675135
+
 
 // set up software variables
 
@@ -77,6 +69,24 @@ GLUquadric *quadCylinder;
 GLUquadric *quadDisk;
 GLint slices, stacks;
 GLint nsides, rings;
+
+// trigonometric constants
+float sqrt3;
+float pi;    // PI
+float sin120;   
+float cos120;        
+float tan60;
+float sin30;
+float tan30;
+float pion180;
+float sin60;
+float sin180;
+float sin300;
+float cos60;
+float cos180;
+float cos300;
+float sqrt3on3;
+float sqrt3on6;
 
 // set up robot variables
 
@@ -237,19 +247,37 @@ GLubyte bitmap_font[][13] = {
 };
 
 void variables_init(void){
-robot_top_platform_triangle_v1_x = robot_top_platform_triangle_radius*SIN180;
+
+sqrt3 = sqrt(3.0);
+pi = 3.141592653;    // PI
+sin120 = sqrt3/2.0;   
+cos120 = -0.5;        
+tan60 = sqrt3;
+sin30 = 0.5;
+tan30 = 1/sqrt3;
+pion180 = (pi/180.0);
+sin60 = sin(60*pion180);
+sin180 =sin(180*pion180);
+sin300 =sin(300*pion180);
+cos60 = cos(60*pion180);
+cos180 =cos(180*pion180);
+cos300 =cos(300*pion180);
+sqrt3on3 = sqrt(3)/3;
+sqrt3on6 = sqrt(3)/6;
+
+robot_top_platform_triangle_v1_x = robot_top_platform_triangle_radius*sin180;
 robot_top_platform_triangle_v1_y = 0.0f;
-robot_top_platform_triangle_v1_z = robot_top_platform_triangle_radius*COS180;
+robot_top_platform_triangle_v1_z = robot_top_platform_triangle_radius*cos180;
 
-robot_top_platform_triangle_v2_x = robot_top_platform_triangle_radius*SIN60;
+robot_top_platform_triangle_v2_x = robot_top_platform_triangle_radius*sin60;
 robot_top_platform_triangle_v2_y = 0.0f;
-robot_top_platform_triangle_v2_z = robot_top_platform_triangle_radius*COS60;
+robot_top_platform_triangle_v2_z = robot_top_platform_triangle_radius*cos60;
 
-robot_top_platform_triangle_v3_x = robot_top_platform_triangle_radius*SIN300;
+robot_top_platform_triangle_v3_x = robot_top_platform_triangle_radius*sin300;
 robot_top_platform_triangle_v3_y = 0.0f;
-robot_top_platform_triangle_v3_z = robot_top_platform_triangle_radius*COS300;
+robot_top_platform_triangle_v3_z = robot_top_platform_triangle_radius*cos300;
 
-robot_top_platform_triangle_sidelength = robot_top_platform_triangle_radius / SQRT3ON3;
+robot_top_platform_triangle_sidelength = robot_top_platform_triangle_radius / sqrt3on3;
 robot_top_platform_triangle_inscribed = sqrt((robot_top_platform_triangle_radius*robot_top_platform_triangle_radius)-((robot_top_platform_triangle_sidelength/2)*(robot_top_platform_triangle_sidelength/2)));
 
 };
@@ -386,16 +414,29 @@ void update_view(void){
     
     view_lookfrom_x_linear += view_momentum_x;
     if((view_momentum_x > 0.01)||(view_momentum_x < -0.01)) {
-    view_momentum_x = view_momentum_x/1.01;
+    view_momentum_x = view_momentum_x/1.05;
     } else {
     view_momentum_x = 0.0;
     };
+
     view_lookfrom_y_linear += view_momentum_y;
     if((view_momentum_y > 0.01)||(view_momentum_y < -0.01)) {
-    view_momentum_y = view_momentum_y/1.01;
+    view_momentum_y = view_momentum_y/1.05;
     } else {
     view_momentum_y = 0.0;
     };
+
+    if(view_distance_from_model < 10){
+    view_momentum_z = 0;
+    view_distance_from_model = 10;
+    }
+    view_distance_from_model += view_momentum_z;
+    if((view_momentum_z > 0.01)||(view_momentum_z < -0.01)) {
+    view_momentum_z = view_momentum_z/1.05;
+    } else {
+    view_momentum_z = 0.0;
+    };
+
 
     if(holdingLeftStrafe) {
     view_momentum_x += 0.1;
@@ -436,10 +477,12 @@ void update_view(void){
     };
    
     if(holdingZoomIn) {
-    view_distance_from_model += 1;
+    //view_distance_from_model += 1;
+    view_momentum_z +=0.1;
     };
     if(holdingZoomOut) {
-    view_distance_from_model -= 1;
+    //view_distance_from_model -= 1;
+    view_momentum_z -=0.1;
     };
    
 
@@ -447,9 +490,9 @@ void update_view(void){
     // so 'linear' should go from -180 to 180, starting at zero.
     // it will generate a position about the origin
 
-    view_lookfrom_x = cos(view_lookfrom_x_linear*PION180)*cos(view_lookfrom_y_linear*PION180)*view_distance_from_model;
-    view_lookfrom_y = sin(view_lookfrom_y_linear*PION180)*view_distance_from_model;
-    view_lookfrom_z = cos(view_lookfrom_y_linear*PION180)*sin(view_lookfrom_x_linear*PION180)*view_distance_from_model;
+    view_lookfrom_x = cos(view_lookfrom_x_linear*pion180)*cos(view_lookfrom_y_linear*pion180)*view_distance_from_model;
+    view_lookfrom_y = sin(view_lookfrom_y_linear*pion180)*view_distance_from_model;
+    view_lookfrom_z = cos(view_lookfrom_y_linear*pion180)*sin(view_lookfrom_x_linear*pion180)*view_distance_from_model;
  
 }
 
@@ -512,7 +555,7 @@ void draw_text_layers(void){
     
     float momentX = view_momentum_x;
     float momentY = view_momentum_y;
-    float momentD = 0;
+    float momentD = view_momentum_z;
     
     
     //memset(sprinter, 0, sizeof(sprinter));
