@@ -69,7 +69,7 @@ const int fs_window_width = 1366, fs_window_height = 768;
 
 int startxMouse, startyMouse, xMouse, yMouse, h;
 float colors[4];
-char sprinter[15];
+char sprinter[50];
 int clicked = 0;
 int holdingForward, holdingBackward, holdingLeftStrafe, holdingRightStrafe, holdingZoomIn, holdingZoomOut;
 GLUquadric *quadSphere;
@@ -130,6 +130,7 @@ float view_lookfrom_x_linear = 0.0f;
 float view_lookfrom_y_linear = 0.0f;
 float view_lookfrom_z_linear = 0.0f;
 float view_distance_from_model = 50.0f;
+float view_orientation = -1;
 
 float view_momentum_x = 0.0f;
 float view_momentum_y = 0.0f;
@@ -380,6 +381,22 @@ void handleKeypress(int theKey, int theAction)
 }
 
 void update_view(void){
+
+    //use momentum
+    
+    view_lookfrom_x_linear += view_momentum_x;
+    if((view_momentum_x > 0.01)||(view_momentum_x < -0.01)) {
+    view_momentum_x = view_momentum_x/1.01;
+    } else {
+    view_momentum_x = 0.0;
+    };
+    view_lookfrom_y_linear += view_momentum_y;
+    if((view_momentum_y > 0.01)||(view_momentum_y < -0.01)) {
+    view_momentum_y = view_momentum_y/1.01;
+    } else {
+    view_momentum_y = 0.0;
+    };
+
     if(holdingLeftStrafe) {
     view_momentum_x += 0.1;
     };
@@ -387,15 +404,37 @@ void update_view(void){
     view_momentum_x -= 0.1;
     };
     if(holdingBackward) {
-    if(view_lookfrom_y_linear < 88){
-    view_lookfrom_y_linear += 1;
-    }
+    view_momentum_y += 0.1;
+    //view_lookfrom_y_linear += 1;
     };
     if(holdingForward) {
-    if(view_lookfrom_y_linear > -88){
-    view_lookfrom_y_linear -= 1;
-    }
+    view_momentum_y -= 0.1;
+    //view_lookfrom_y_linear -= 1;
     };
+    view_orientation = 1; 
+    
+    if((view_lookfrom_y_linear > 90)||(view_lookfrom_y_linear < -90)){
+    view_orientation = -1;
+    };
+    
+    if(view_lookfrom_y_linear > 180){
+    view_orientation = -1;
+    view_lookfrom_y_linear = -179.9;
+    } else {
+    if(view_lookfrom_y_linear < -180){
+    view_orientation = -1;
+    view_lookfrom_y_linear = 179.9;
+    };
+    };
+    
+    if(view_lookfrom_x_linear > 180){
+    view_lookfrom_x_linear = -179.9;
+    } else {
+    if(view_lookfrom_x_linear < -180){
+    view_lookfrom_x_linear = 179.9;
+    };
+    };
+   
     if(holdingZoomIn) {
     view_distance_from_model += 1;
     };
@@ -403,16 +442,7 @@ void update_view(void){
     view_distance_from_model -= 1;
     };
    
-    //use momentum
-    
-    view_lookfrom_x_linear += view_momentum_x;
-    if(view_momentum_x) {
-    view_momentum_x = view_momentum_x/1.01;
-    };
-    view_lookfrom_y_linear += view_momentum_y;
-    if(view_momentum_y) {
-    view_momentum_y = view_momentum_y/1.01;
-    };
+
 
     // so 'linear' should go from -180 to 180, starting at zero.
     // it will generate a position about the origin
@@ -430,7 +460,7 @@ void graphics_draw(void) {
     gluLookAt(
     view_lookfrom_x, view_lookfrom_y, view_lookfrom_z,
     view_lookat_x, view_lookat_y, view_lookat_z,
-    0.0f, 1.0f, 0.0f
+    0.0f, view_orientation, 0.0f
     );
 		
 		
@@ -452,7 +482,7 @@ void graphics_draw(void) {
 void graphics_loop(void) {
   while(glfwGetWindowParam(GLFW_ACTIVE))
   {
-  glfwSleep(0.015);
+  glfwSleep(0.008);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   graphics_draw();
   glfwSwapBuffers();
@@ -475,6 +505,27 @@ void draw_text_layers(void){
     glRasterPos3f(0,6,0);   printString("(c) 2012 TimKrins");
     glColor3f(0.7, 0.7, 0.7);
     glRasterPos3f(0,5,0);   printString("UNFINISHED BUT PRETTY LOL");
+    
+    int dubX = (int)view_lookfrom_x_linear;
+    int dubY = (int)view_lookfrom_y_linear;
+    int dubD = (int)view_distance_from_model;
+    
+    float momentX = view_momentum_x;
+    float momentY = view_momentum_y;
+    float momentD = 0;
+    
+    
+    //memset(sprinter, 0, sizeof(sprinter));
+    sprintf(sprinter, "XVIEW: %i, YVIEW: %i, DIST: %i", dubX , dubY , dubD);
+    glColor3f(.9f, .9f, .9f);
+    glRasterPos3f(0,4,0);
+    printString(sprinter);
+    memset(sprinter, 0, sizeof(sprinter));
+    
+    sprintf(sprinter, "XMomentum: %.2f, YMomentum: %.2f, DMomentum: %.2f", momentX , momentY , momentD);
+    glRasterPos3f(0,4.5,0);
+    printString(sprinter);
+    memset(sprinter, 0, sizeof(sprinter));
 };
 
 void draw_delta_robot(void){
