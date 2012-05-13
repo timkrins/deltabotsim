@@ -24,6 +24,7 @@ void graphics_draw(void);
 void graphics_loop(void);
 void handleMouseClick(int button, int action);
 void handleKeypress(int theKey, int theAction);
+int calculate_delta(float theta1, float theta2, float theta3);
 
 
 // prototype various drawing functions
@@ -63,7 +64,7 @@ int startxMouse, startyMouse, xMouse, yMouse, h;
 float colors[4];
 char sprinter[50];
 int clicked = 0;
-int holdingForward, holdingBackward, holdingLeftStrafe, holdingRightStrafe, holdingZoomIn, holdingZoomOut;
+int holdingW, holdingS, holdingA, holdingD, holdingQ, holdingE, holdingI, holdingJ, holdingO, holdingK, holdingP, holdingL;
 GLUquadric *quadSphere;
 GLUquadric *quadCylinder;
 GLUquadric *quadDisk;
@@ -72,7 +73,7 @@ GLint nsides, rings;
 
 // trigonometric constants
 float sqrt3;
-float pi;    // PI
+float pi;
 float sin120;   
 float cos120;        
 float tan60;
@@ -109,6 +110,10 @@ float robot_mid_connector_width = 5.0f;
 
 float robot_bottom_arm_length = 20.0f;
 float robot_bottom_arm_radius = 5.0f;
+
+float robot_bottom_platform_triangle_radius = 10.0f;
+float robot_bottom_platform_thickness = 3.0f;
+
 float robot_angle_one = 20.0f;
 float robot_angle_two = 40.0f;
 float robot_angle_three = 60.0f;
@@ -126,6 +131,12 @@ float robot_top_platform_triangle_sidelength;
 float robot_top_platform_triangle_inscribed;
 
 float startrotation = 0.0f;
+
+int value[3];
+
+float robot_end_effector_x;
+float robot_end_effector_y;
+float robot_end_effector_z;
 
 // set view variables
 float view_lookat_x = 0.0f;
@@ -249,7 +260,7 @@ GLubyte bitmap_font[][13] = {
 void variables_init(void){
 
 sqrt3 = sqrt(3.0);
-pi = 3.141592653;    // PI
+pi = 3.141592653;
 sin120 = sqrt3/2.0;   
 cos120 = -0.5;        
 tan60 = sqrt3;
@@ -295,6 +306,28 @@ void makeBitmapFonts(void)
         glEndList();
     }
 }
+
+int calculate_delta(float theta1, float theta2, float theta3) {
+     float t = (robot_top_platform_triangle_radius-robot_bottom_platform_triangle_radius)*tan30/2.0; float dtr = pi/(float)180.0;
+     float y1 = -(t + robot_top_arm_length*cos(theta1*dtr));float z1 = -robot_top_arm_length*sin(theta1*dtr);
+     float y2 = (t + robot_top_arm_length*cos(theta2*dtr))*sin30;float x2 = y2*tan60;
+     float z2 = -robot_top_arm_length*sin(theta2*dtr);float y3 = (t + robot_top_arm_length*cos(theta3*dtr))*sin30;
+     float x3 = -y3*tan60;float z3 = -robot_top_arm_length*sin(theta3*dtr);
+     float dnm = (y2-y1)*x3-(y3-y1)*x2;float w1 = y1*y1 + z1*z1;
+     float w2 = x2*x2 + y2*y2 + z2*z2;float w3 = x3*x3 + y3*y3 + z3*z3;
+     float a1 = (z2-z1)*(y3-y1)-(z3-z1)*(y2-y1);float b1 = -((w2-w1)*(y3-y1)-(w3-w1)*(y2-y1))/2.0;
+     float a2 = -(z2-z1)*x3+(z3-z1)*x2;float b2 = ((w2-w1)*x3 - (w3-w1)*x2)/2.0;
+     float a = a1*a1 + a2*a2 + dnm*dnm;float b = 2*(a1*b1 + a2*(b2-y1*dnm) - z1*dnm*dnm);
+     float c = (b2-y1*dnm)*(b2-y1*dnm) + b1*b1 + dnm*dnm*(z1*z1 - robot_bottom_arm_length*robot_bottom_arm_length);
+     float d = b*b - (float)4.0*a*c;if (d < 0) return -1;
+     float zval0 = -(float)0.5*(b+sqrt(d))/a;float xval0 = (a1*zval0 + b1)/dnm;
+     float yval0 = (a2*zval0 + b2)/dnm;
+     robot_end_effector_x = xval0;
+     robot_end_effector_y = yval0;
+     robot_end_effector_z = zval0;
+     return 0;
+ }
+
 
 void quit(void)
 {
@@ -357,23 +390,41 @@ void handleKeypress(int theKey, int theAction)
         switch(theKey)
         {
         case 'W':
-            holdingForward = 1;
+            holdingW = 1;
             break;
         case 'S':
-            holdingBackward = 1;
+            holdingS = 1;
             break;
         case 'A':
-            holdingLeftStrafe = 1;
+            holdingA = 1;
             break;
         case 'D':
-            holdingRightStrafe = 1;
+            holdingD = 1;
             break;
         case 'Q':
-            holdingZoomIn = 1;
+            holdingQ = 1;
             break;
         case 'E':
-            holdingZoomOut = 1;
+            holdingE = 1;
             break;
+        case 'P':
+            holdingP = 1;
+                    break;
+        case 'L':
+            holdingL = 1;
+                    break;
+        case 'O':
+            holdingO = 1;
+                    break;
+        case 'K':
+            holdingK = 1;
+                    break;
+        case 'I':
+            holdingI = 1;
+                    break;
+        case 'J':
+            holdingJ = 1;
+                    break;
         default:
             // Do nothing...
             break;
@@ -384,23 +435,40 @@ void handleKeypress(int theKey, int theAction)
         switch(theKey)
         {
         case 'W':
-            holdingForward = 0;
+            holdingW = 0;
             break;
         case 'S':
-            holdingBackward = 0;
+            holdingS = 0;
             break;
         case 'A':
-            holdingLeftStrafe = 0;
+            holdingA = 0;
             break;
         case 'D':
-            holdingRightStrafe = 0;
+            holdingD = 0;
             break;
         case 'Q':
-            holdingZoomIn = 0;
+            holdingQ = 0;
             break;
         case 'E':
-            holdingZoomOut = 0;
+            holdingE = 0;
             break;
+        case 'P':
+            holdingP = 0;
+                    break;
+        case 'L':
+            holdingL = 0;
+                    break;
+        case 'O':
+            holdingO = 0;
+                    break;
+        case 'K':
+            holdingK = 0;
+                    break;
+        case 'I':
+            holdingI = 0;
+                    break;
+        case 'J':
+            holdingJ = 0;
         default:
             // Do nothing...
             break;
@@ -438,17 +506,17 @@ void update_view(void){
     };
 
 
-    if(holdingLeftStrafe) {
+    if(holdingA) {
     view_momentum_x += 0.1;
     };
-    if(holdingRightStrafe) {
+    if(holdingD) {
     view_momentum_x -= 0.1;
     };
-    if(holdingBackward) {
+    if(holdingS) {
     view_momentum_y += 0.1;
     //view_lookfrom_y_linear += 1;
     };
-    if(holdingForward) {
+    if(holdingW) {
     view_momentum_y -= 0.1;
     //view_lookfrom_y_linear -= 1;
     };
@@ -476,16 +544,38 @@ void update_view(void){
     };
     };
    
-    if(holdingZoomIn) {
+    if(holdingQ) {
     //view_distance_from_model += 1;
     view_momentum_z +=0.1;
     };
-    if(holdingZoomOut) {
+    if(holdingE) {
     //view_distance_from_model -= 1;
     view_momentum_z -=0.1;
     };
    
-
+    if(holdingP) {
+    robot_angle_three +=0.5;
+    };
+    
+    if(holdingL) {
+    robot_angle_three -=0.5;
+    };
+    
+    if(holdingO) {
+    robot_angle_two +=0.5;
+    };
+   
+    if(holdingK) {
+    robot_angle_two -=0.5;
+    };
+    
+    if(holdingI) {
+    robot_angle_one +=0.5;
+    };
+    
+    if(holdingJ) {
+    robot_angle_one -=0.5;
+    };
 
     // so 'linear' should go from -180 to 180, starting at zero.
     // it will generate a position about the origin
@@ -573,7 +663,7 @@ void draw_text_layers(void){
 
 void draw_delta_robot(void){
     draw_top_base();
-    //draw_bottom_base();
+    draw_bottom_base();
     draw_arms();
 };
 
@@ -756,13 +846,20 @@ void draw_topbase_full_bottom(void){
 };
 
 void draw_bottom_base(void){
+
+
     draw_botbase_full_top();
-    draw_botbase_onethird_sides();
-    draw_botbase_full_bottom();
+    //draw_botbase_onethird_sides();
+    //draw_botbase_full_bottom();
 };
 
 void draw_botbase_full_top(void){
-
+glPushMatrix();
+calculate_delta(robot_angle_one, robot_angle_two, robot_angle_three);
+// Remember, our axes are different. Y is actually Z.
+glTranslatef(robot_end_effector_x,robot_end_effector_z, 0-robot_end_effector_y);
+gluSphere(quadSphere, 1, 32, 16);
+glPopMatrix();
 };
 
 void draw_botbase_onethird_sides(void){
