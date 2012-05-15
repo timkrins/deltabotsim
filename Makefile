@@ -1,4 +1,4 @@
-PROGRAM = aelta
+PROGRAM = sliced
 
 SOURCES = $(PROGRAM).c
 CC = $(ARCH)gcc
