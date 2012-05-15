@@ -228,30 +228,12 @@ robot_joint2[2] = j_z[currentslice]; //Z
 // this is the angle on the side #########################
 //robot_arm_first_angles[currentslice] = atan((robot_joint2[1]-robot_plat_effector[currentslice][1])/(robot_joint2[0]-robot_plat_effector[currentslice][0]))/pion180;
 
-robot_arm_first_angles[currentslice] = atan(((j_x[currentslice]-ee[0])/cos((currentslice*120.0)*pion180))/(fabs(ee[2])-fabs(j_z[currentslice])))/pion180;
-//robot_arm_first_angles[currentslice] = atan(j_x[currentslice]*(TESTING)/(fabs(ee[2])-fabs(j_z[currentslice])))/pion180;
-/*
-                       = fabs(
-                             atan(
-                                     (
-                                         (
-                                             (j_real_x[currentslice]-end_x[currentslice])
-                                             /
-                                             (cos((currentslice*120.0)*pion180))
-                                         )
-                                      /
-                                        (
-                                             (fabs(end_z[currentslice])-fabs(j_real_z[currentslice]))
-                                             /
-                                             (1)
-                                         )
-                                      )
-                                      /
-                                      pion180
-                                  )
-                               );
+// Something is different about the X angles.
+robot_arm_first_angles[currentslice] =  atan((((j_x[currentslice]-ee[0])/cos((currentslice*120.0)*pion180)))/(fabs(ee[2])-fabs(j_z[currentslice])))/pion180;
+//robot_arm_second_angles[currentslice] = atan((((ee[1]-j_y[currentslice])/sin((currentslice*120.0)*pion180)))/(fabs(ee[2])-fabs(j_z[currentslice])))/pion180;
 
-*/
+//#robot_arm_first_angles[currentslice] =  atan((((j_x[currentslice]-ee[0])/cos((currentslice*120.0)*pion180)))/(fabs(ee[2])-fabs(j_z[currentslice])))/pion180;
+//#robot_arm_second_angles[currentslice] = atan((((ee[1]-j_y[currentslice])/sin((currentslice*120.0)*pion180)))/(fabs(ee[2])-fabs(j_z[currentslice])))/pion180;
 
 //height = (robot_joint2[1] - robot_end_effector[1])
 //length = robot_joint2[0]-robot_end_effector[0] //make sure this is relevant to the corrdinates.
@@ -261,6 +243,7 @@ robot_arm_first_angles[currentslice] = atan(((j_x[currentslice]-ee[0])/cos((curr
 //robot_arm_second_angles[currentslice] = atan((robot_joint2[0]-robot_end_effector[0])/(robot_end_effector[1]-robot_joint2[2]))/pion180;
 
 if((holdingC)){
+
 printf("Slice Number: %d\nSlice Angle:%f\n\n", currentslice, currentslice*120.0);
 
 
@@ -271,6 +254,7 @@ printf("Joint REAL X %f, Y %f, Z %f\n", j_real_x[currentslice], j_real_y[current
 printf("Joint X %f, Y %f, Z %f\n", j_x[currentslice], j_y[currentslice], j_z[currentslice]);
 printf("NextAngle fabs %f\n", (robot_arm_first_angles[currentslice]));
 printf("NextAngle fabs Plus90  %f\n", (robot_arm_first_angles[currentslice])+90);
+printf("########################## FinalAngle fabs %f\n", (robot_arm_second_angles[currentslice]));
 printf("EndEffectorJoinBase X %f, Y %f, Z %f\n", end_x[currentslice],end_y[currentslice], end_z[currentslice]);
 printf("EndEffectorCenter X %f, Y %f, Z %f\n\n", ee[0],ee[1], ee[2]);
 
@@ -296,6 +280,6 @@ gluSphere(quadSphere, 1, 32, 16);
 glRotatef(robot_arm_first_angles[currentslice]+90,1,0,0); // angle it down.
 multi = multi/1.2; glColor3f(color_red*multi, color_green*multi, color_blue*multi);
 //glRotatef(robot_arm_first_angles[currentslice],1,0,0); // angle it down.
-//glRotatef(robot_arm_second_angles[currentslice],0,1,0); // angle it sideways.
+glRotatef(robot_arm_second_angles[currentslice],0,1,0); // angle it sideways.
 draw_cuboid(robot_top_arm_width, robot_top_arm_height, robot_bottom_arm_length);
 }

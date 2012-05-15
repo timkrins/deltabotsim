@@ -79,8 +79,8 @@ float robot_bottom_platform_thickness = 3.0f;
 
 float robot_angles[] = { 70.0f, 70.0f, 70.0f };
 float robot_joint2[3];
-float robot_arm_first_angles[] = {90, 90, 90}; // the side on rotation
-float robot_arm_second_angles[] = {20, 20, 20}; // the forward facing rotation
+float robot_arm_first_angles[] = {0,0,0}; // the side on rotation
+float robot_arm_second_angles[] = {0,0,0}; // the forward facing rotation
 
 float robot_end_effector[3];
 //float robot_end_effector_x;

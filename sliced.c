@@ -74,24 +74,6 @@ struct vec3d {
 #include "shapes.c"
 #include "robot.c"
 #include "text.c"
-#include "bitmap.c"
-
-void makeBitmapFonts(void){
-// ########################
-// Create the bitmap fonts.
-// ########################
-GLint i;
-glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-fontOffset = glGenLists(128);
-for (i = 32; i < 127; i++) {
-    glNewList(i+fontOffset, GL_COMPILE);
-        glBitmap(8, 13, 0.0, 2.0, 10.0, 0.0, bitmap_font[i-32]);
-    glEndList();
-};
-};
-
-
- 
 
 vec3d vdiff(const vec3d vector1, const vec3d vector2){
 /* Return the difference of two vectors, (vector1 - vector2). */
@@ -428,15 +410,6 @@ quadDisk=gluNewQuadric();
 glfwSetKeyCallback(handleKeypress);
 };
 
-void printString(char *s){
-// #############################################################
-// Prints a string using bitmap fonts at current raster location
-// #############################################################
-glPushAttrib (GL_LIST_BIT);
-glListBase(fontOffset);
-glCallLists(strlen(s), GL_UNSIGNED_BYTE, (GLubyte *) s);
-glPopAttrib();
-};
 
 void handleKeypress(int theKey, int theAction){
 // #################################################
@@ -596,7 +569,7 @@ gluLookAt(view_lookfrom_x, view_lookfrom_y, view_lookfrom_z,view_lookat_x, view_
 // Draw all things here.
 // !!!!!!!!!!!!!!!!!!!!!!
 draw_delta_robot();
-//draw_text_layers();
+draw_text_layers();
 // !!!!!!!!!!!!!!!!!!!!!!!!!
 // Stop drawing things here.
 // !!!!!!!!!!!!!!!!!!!!!!!!!
