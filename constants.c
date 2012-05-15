@@ -20,6 +20,7 @@ float colors[4];
 float current_position[16];
 char sprinter[50];
 int holdingW, holdingS, holdingA, holdingC, holdingD, holdingQ, holdingE, holdingI, holdingJ, holdingO, holdingK, holdingP, holdingL;
+int holding0, holding1, holding2, holding3, holding4, holding5, holding6, holding7, holding8, holding9, holding0;
 float rotation = 0;
 GLUquadric *quadSphere;
 GLUquadric *quadCylinder;
@@ -139,6 +140,10 @@ float base_calc_z[3];
 float end_x[3];
 float end_y[3];
 float end_z[3];
+
+float top_eqns[3];
+float btm_eqns[3];
+float entire_eqn[3];
 
 float ee[3];
 vec3d p1, p2, p3;

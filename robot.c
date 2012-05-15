@@ -229,7 +229,17 @@ robot_joint2[2] = j_z[currentslice]; //Z
 //robot_arm_first_angles[currentslice] = atan((robot_joint2[1]-robot_plat_effector[currentslice][1])/(robot_joint2[0]-robot_plat_effector[currentslice][0]))/pion180;
 
 // Something is different about the X angles.
-robot_arm_first_angles[currentslice] =  atan((((j_x[currentslice]-ee[0])/cos((currentslice*120.0)*pion180)))/(fabs(ee[2])-fabs(j_z[currentslice])))/pion180;
+//top_eqns[currentslice] = ((j_x[currentslice]-ee[0])/cos((currentslice*120.0)*pion180));
+
+//!!!!! satisfies direct translations! but funny with sides...
+//top_eqns[currentslice] = fabs((j_x[currentslice]-ee[0])*cos((currentslice*120.0)*pion180)) + fabs((j_y[currentslice]-ee[1])*sin((currentslice*120.0)*pion180));
+
+//!!!!! no fabs! Correct!
+top_eqns[currentslice] = ((j_x[currentslice]-ee[0])*cos((currentslice*120.0)*pion180)) + ((j_y[currentslice]-ee[1])*sin((currentslice*120.0)*pion180));
+
+btm_eqns[currentslice] = (fabs(ee[2])-fabs(j_z[currentslice]));
+entire_eqn[currentslice] = top_eqns[currentslice]/btm_eqns[currentslice];
+robot_arm_first_angles[currentslice] =  90+atan(entire_eqn[currentslice])/pion180;
 //robot_arm_second_angles[currentslice] = atan((((ee[1]-j_y[currentslice])/sin((currentslice*120.0)*pion180)))/(fabs(ee[2])-fabs(j_z[currentslice])))/pion180;
 
 //#robot_arm_first_angles[currentslice] =  atan((((j_x[currentslice]-ee[0])/cos((currentslice*120.0)*pion180)))/(fabs(ee[2])-fabs(j_z[currentslice])))/pion180;
@@ -277,7 +287,8 @@ multi = multi/1.2; glColor3f(color_red*multi, color_green*multi, color_blue*mult
 //glTranslatef(0, 0, robot_top_arm_length);
 gluSphere(quadSphere, 1, 32, 16);
 
-glRotatef(robot_arm_first_angles[currentslice]+90,1,0,0); // angle it down.
+glRotatef(robot_arm_first_angles[currentslice],1,0,0); // angle it down.
+//glRotatef(robot_arm_first_angles[currentslice]+90,1,0,0); // angle it down.
 multi = multi/1.2; glColor3f(color_red*multi, color_green*multi, color_blue*multi);
 //glRotatef(robot_arm_first_angles[currentslice],1,0,0); // angle it down.
 glRotatef(robot_arm_second_angles[currentslice],0,1,0); // angle it sideways.

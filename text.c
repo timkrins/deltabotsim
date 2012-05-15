@@ -94,7 +94,7 @@ go back to whereever you were.
     centre_align_text(0, "W,A,S,D,Q,E,I,J,O,K,P,L");
     
     
-    int current_line_height = 20;
+    int current_line_height = 30;
     char text_str[50];
         
     glColor3f(0.8, 0.8, 0.8);
@@ -146,6 +146,124 @@ go back to whereever you were.
     strcat(text_str," degrees.");
     right_align_text(current_line_height--, text_str);
     memset(text_str, 0, sizeof(text_str));
+    
+    current_line_height--;
+    
+    glColor3f(0.8, 0.8, 0.8);
+    right_align_text(current_line_height--, "Debug Variables:");
+    
+    glColor3f(0.5, 0.9, 0.5);
+    strcat(text_str,"TopEqn = ");
+    strcat(text_str, make_text(top_eqns[0]));
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    glColor3f(0.5, 0.5, 0.9);
+    strcat(text_str,"TopEqn = ");
+    strcat(text_str, make_text(top_eqns[1]));
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    glColor3f(0.9, 0.5, 0.5);
+    strcat(text_str,"TopEqn = ");
+    strcat(text_str, make_text(top_eqns[2]));
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    glColor3f(0.5, 0.9, 0.5);
+    strcat(text_str,"BtmEqn = ");
+    strcat(text_str, make_text(btm_eqns[0]));
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    glColor3f(0.5, 0.5, 0.9);
+    strcat(text_str,"BtmEqn = ");
+    strcat(text_str, make_text(btm_eqns[1]));
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    glColor3f(0.9, 0.5, 0.5);
+    strcat(text_str,"BtmEqn = ");
+    strcat(text_str, make_text(btm_eqns[2]));
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    glColor3f(0.5, 0.9, 0.5);
+    strcat(text_str,"TotalEqn = ");
+    strcat(text_str, make_text(entire_eqn[0]));
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    glColor3f(0.5, 0.5, 0.9);
+    strcat(text_str,"TotalEqn = ");
+    strcat(text_str, make_text(entire_eqn[1]));
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    glColor3f(0.9, 0.5, 0.5);
+    strcat(text_str,"TotalEqn = ");
+    strcat(text_str, make_text(entire_eqn[2]));
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+ /* glColor3f(0.1, 0.9, 0.1);
+    strcat(text_str,"TopEqn = ");
+    strcat(text_str, make_text(top_eqns[0]));
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    glColor3f(0.1, 0.9, 0.1);
+    strcat(text_str,"BtmEqn = ");
+    strcat(text_str, make_text(btm_eqns[0]));
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    glColor3f(0.1, 0.9, 0.1);
+    strcat(text_str,"TotalEqn = ");
+    strcat(text_str, make_text(entire_eqn[0]));
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    glColor3f(0.1, 0.1, 0.9);
+    strcat(text_str,"TopEqn = ");
+    strcat(text_str, make_text(top_eqns[1]));
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    glColor3f(0.1, 0.1, 0.9);
+    strcat(text_str,"BtmEqn = ");
+    strcat(text_str, make_text(btm_eqns[1]));
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    glColor3f(0.1, 0.1, 0.9);
+    strcat(text_str,"TotalEqn = ");
+    strcat(text_str, make_text(entire_eqn[1]));
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    glColor3f(0.9, 0.1, 0.1);
+    strcat(text_str,"TopEqn = ");
+    strcat(text_str, make_text(top_eqns[2]));
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    glColor3f(0.9, 0.1, 0.1);
+    strcat(text_str,"BtmEqn = ");
+    strcat(text_str, make_text(btm_eqns[2]));
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    glColor3f(0.9, 0.1, 0.1);
+    strcat(text_str,"TotalEqn = ");
+    strcat(text_str, make_text(entire_eqn[2]));
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    
+  */
+    /*
+    glColor3f(0.9, 0.1, 0.1);
+    strcat(text_str,"Three ");
+    strcat(text_str, make_text(robot_arm_first_angles[2]));
+    strcat(text_str," degrees.");
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    */
 
 glMatrixMode(GL_PROJECTION);
 glPopMatrix();

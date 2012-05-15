@@ -430,6 +430,18 @@ if (theAction == GLFW_PRESS){
     case 'K': holdingK = 1; break;
     case 'I': holdingI = 1; break;
     case 'J': holdingJ = 1; break;
+    
+    case '1': holding1 = 1; break;
+    case '2': holding2 = 1; break;
+    case '3': holding3 = 1; break;
+    case '4': holding4 = 1; break;
+    case '5': holding5 = 1; break;
+    case '6': holding6 = 1; break;
+    case '7': holding7 = 1; break;
+    case '8': holding8 = 1; break;
+    case '9': holding9 = 1; break;
+    case '0': holding0 = 1; break;
+    
     default: break;
     }
   } else {
@@ -447,6 +459,18 @@ if (theAction == GLFW_PRESS){
     case 'K': holdingK = 0; break;
     case 'I': holdingI = 0; break;
     case 'J': holdingJ = 0; break;
+    
+    case '1': holding1 = 0; break;
+    case '2': holding2 = 0; break;
+    case '3': holding3 = 0; break;
+    case '4': holding4 = 0; break;
+    case '5': holding5 = 0; break;
+    case '6': holding6 = 0; break;
+    case '7': holding7 = 0; break;
+    case '8': holding8 = 0; break;
+    case '9': holding9 = 0; break;
+    case '0': holding0 = 0; break;
+    
     default: break;
     };
   };
@@ -548,7 +572,15 @@ if(holdingK) { if(robot_angles[1] > 0) {robot_angles[1] -=0.5; }; };
 if(holdingP) { if(robot_angles[2] < 89) {robot_angles[2] +=0.5; };};
 if(holdingL) { if(robot_angles[2] > 0) {robot_angles[2] -=0.5; }; };
 
+if(holding0) {robot_angles[0] = 0; robot_angles[1] = 0; robot_angles[2] = 0;};
 
+if(holding1) {robot_angles[0] = 70;};
+if(holding2) {robot_angles[1] = 70;};
+if(holding3) {robot_angles[2] = 70;};
+
+if(holding4) {robot_angles[0] = 45;};
+if(holding5) {robot_angles[1] = 45;};
+if(holding6) {robot_angles[2] = 45;};
 
 // ###################################
 // Calculate the camera's coordinates.
