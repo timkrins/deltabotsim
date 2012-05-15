@@ -18,6 +18,7 @@
 #include <GL/glu.h>
 #include <GL/glext.h>
 #include <math.h>
+#define   MAXZERO  0.0
 
 // protoype software functions
 
@@ -28,7 +29,7 @@ void graphics_draw(void);
 void graphics_loop(void);
 void handleMouseClick(int button, int action);
 void handleKeypress(int theKey, int theAction);
-int calculate_delta(float theta1, float theta2, float theta3);
+int calculate_delta(void);
 
 // prototype the drawing functions
 
@@ -55,6 +56,16 @@ void draw_centered_closed_cylinder(float radius, float length);
 
 void color_darken(void);
 
+
+//build structs
+
+typedef struct vec3d    vec3d;
+struct vec3d {
+        double  x;
+        double  y;
+        double  z;
+};
+
 //##################################################
 // Bring in external source files.
 // I have orginised these to make it easier to code.
@@ -79,13 +90,197 @@ for (i = 32; i < 127; i++) {
 };
 };
 
-int calculate_delta(float theta1, float theta2, float theta3) {
+
+ 
+
+vec3d vdiff(const vec3d vector1, const vec3d vector2){
+/* Return the difference of two vectors, (vector1 - vector2). */
+        vec3d v;
+        v.x = vector1.x - vector2.x;
+        v.y = vector1.y - vector2.y;
+        v.z = vector1.z - vector2.z;
+        return v;
+}
+ 
+
+vec3d vsum(const vec3d vector1, const vec3d vector2){
+/* Return the sum of two vectors. */
+        vec3d v;
+        v.x = vector1.x + vector2.x;
+        v.y = vector1.y + vector2.y;
+        v.z = vector1.z + vector2.z;
+        return v;
+}
+ 
+
+vec3d vmul(const vec3d vector, const double n){
+/* Multiply vector by a number. */
+        vec3d v;
+        v.x = vector.x * n;
+        v.y = vector.y * n;
+        v.z = vector.z * n;
+        return v;
+}
+ 
+
+vec3d vdiv(const vec3d vector, const double n){
+/* Divide vector by a number. */
+        vec3d v;
+        v.x = vector.x / n;
+        v.y = vector.y / n;
+        v.z = vector.z / n;
+        return v;
+}
+ 
+double vnorm(const vec3d vector){
+/* Return the Euclidean norm. */
+        return sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z);
+}
+ 
+double dot(const vec3d vector1, const vec3d vector2){
+/* Return the dot product of two vectors. */
+        return vector1.x * vector2.x + vector1.y * vector2.y + vector1.z * vector2.z;
+}
+ 
+
+vec3d cross(const vec3d vector1, const vec3d vector2){
+/* Replace vector with its cross product with another vector. */
+        vec3d v;
+        v.x = vector1.y * vector2.z - vector1.z * vector2.y;
+        v.y = vector1.z * vector2.x - vector1.x * vector2.z;
+        v.z = vector1.x * vector2.y - vector1.y * vector2.x;
+        return v;
+}
+
+int trilateration(vec3d *const result1, vec3d *const result2,
+                  const vec3d p1, const double r1,
+                  const vec3d p2, const double r2,
+                  const vec3d p3, const double r3,
+                  const double maxzero){
+/* Return zero if successful, negative error otherwise.
+ * The last parameter is the largest nonnegative number considered zero;
+ * it is somewhat analoguous to machine epsilon (but inclusive).
+*/
+                  
+        vec3d   ex, ey, ez, t1, t2;
+        double  h, i, j, x, y, z, t;
+ 
+        /* h = |p2 - p1|, ex = (p2 - p1) / |p2 - p1| */
+        ex = vdiff(p2, p1);
+        h = vnorm(ex);
+        if (h <= maxzero) {
+                /* p1 and p2 are concentric. */
+                return -1;
+        }
+        ex = vdiv(ex, h);
+ 
+        /* t1 = p3 - p1, t2 = ex (ex . (p3 - p1)) */
+        t1 = vdiff(p3, p1);
+        i = dot(ex, t1);
+        t2 = vmul(ex, i);
+ 
+        /* ey = (t1 - t2), t = |t1 - t2| */
+        ey = vdiff(t1, t2);
+        t = vnorm(ey);
+        if (t > maxzero) {
+                /* ey = (t1 - t2) / |t1 - t2| */
+                ey = vdiv(ey, t);
+ 
+                /* j = ey . (p3 - p1) */
+                j = dot(ey, t1);
+        } else
+                j = 0.0;
+ 
+        /* Note: t <= maxzero implies j = 0.0. */
+        if (fabs(j) <= maxzero) {
+                /* p1, p2 and p3 are colinear. */
+ 
+                /* Is point p1 + (r1 along the axis) the intersection? */
+                t2 = vsum(p1, vmul(ex, r1));
+                if (fabs(vnorm(vdiff(p2, t2)) - r2) <= maxzero &&
+                    fabs(vnorm(vdiff(p3, t2)) - r3) <= maxzero) {
+                        /* Yes, t2 is the only intersection point. */
+                        if (result1)
+                                *result1 = t2;
+                        if (result2)
+                                *result2 = t2;
+                        return 0;
+                }
+ 
+                /* Is point p1 - (r1 along the axis) the intersection? */
+                t2 = vsum(p1, vmul(ex, -r1));
+                if (fabs(vnorm(vdiff(p2, t2)) - r2) <= maxzero &&
+                    fabs(vnorm(vdiff(p3, t2)) - r3) <= maxzero) {
+                        /* Yes, t2 is the only intersection point. */
+                        if (result1)
+                                *result1 = t2;
+                        if (result2)
+                                *result2 = t2;
+                        return 0;
+                }
+ 
+                return -2;
+        }
+ 
+        /* ez = ex x ey */
+        ez = cross(ex, ey);
+ 
+        x = (r1*r1 - r2*r2) / (2*h) + h / 2;
+        y = (r1*r1 - r3*r3 + i*i) / (2*j) + j / 2 - x * i / j;
+        z = r1*r1 - x*x - y*y;
+        if (z < -maxzero) {
+                /* The solution is invalid. */
+                return -3;
+        } else
+        if (z > 0.0)
+                z = sqrt(z);
+        else
+                z = 0.0;
+ 
+        /* t2 = p1 + x ex + y ey */
+        t2 = vsum(p1, vmul(ex, x));
+        t2 = vsum(t2, vmul(ey, y));
+ 
+        /* result1 = p1 + x ex + y ey + z ez */
+        if (result1)
+                *result1 = vsum(t2, vmul(ez, z));
+ 
+        /* result1 = p1 + x ex + y ey - z ez */
+        if (result2)
+                *result2 = vsum(t2, vmul(ez, -z));
+ 
+        return 0;
+}
+
+vec3d   o1, o2;
+
+int calculate_vectors(vec3d p1, vec3d p2, vec3d p3, double r1, double r2, double r3){
+        int     result;
+                //printf("Sphere 1: %g %g %g, radius %g\n", p1.x, p1.y, p1.z, r1);
+                //printf("Sphere 2: %g %g %g, radius %g\n", p2.x, p2.y, p2.z, r2);
+                //printf("Sphere 3: %g %g %g, radius %g\n\n", p3.x, p3.y, p3.z, r3);
+                result = trilateration(&o1, &o2, p1, r1, p2, r2, p3, r3, MAXZERO);
+                if (result){
+                        printf("No solution (%d).\n", result);
+                } else {
+                        //printf("Solution 1: %.3f %.3f %.3f\n", o1.x, o1.y, o1.z);
+                        //printf("Solution 2: %.3f %.3f %.3f\n\n", o2.x, o2.y, o2.z);
+                        
+                }
+
+}
+
+int calculate_delta(void) {
 // ##################################################################
 // Calculate the position of the end effector using the angles given.
 // This technique is called 'Forward Kinematics'.
 // This code was borrowed from:
 // http://forums.trossenrobotics.com/tutorials/introduction-129/delta-robot-kinematics-3276/
 // ##################################################################
+/*
+
+THIS CODE WAS ACTUALLY RUBBISH LOL
+
 float t = (robot_top_platform_triangle_radius-robot_bottom_platform_triangle_radius)*tan30/2.0; float dtr = pi/(float)180.0;
 float y1 = -(t + robot_top_arm_length*cos(theta1*dtr));float z1 = -robot_top_arm_length*sin(theta1*dtr);
 float y2 = (t + robot_top_arm_length*cos(theta2*dtr))*sin30;float x2 = y2*tan60;
@@ -100,9 +295,97 @@ float c = (b2-y1*dnm)*(b2-y1*dnm) + b1*b1 + dnm*dnm*(z1*z1 - robot_bottom_arm_le
 float d = b*b - (float)4.0*a*c;if (d < 0) return -1;
 float zval0 = -(float)0.5*(b+sqrt(d))/a;float xval0 = (a1*zval0 + b1)/dnm;
 float yval0 = (a2*zval0 + b2)/dnm;
-robot_end_effector[0] = xval0;
-robot_end_effector[1] = yval0;
-robot_end_effector[2] = zval0;
+
+*/
+
+//
+// calculate the values for the base, base_xyz, the joint positions, j_xyz.
+//
+for (int i=0; i < 3; i++){ // run through each slice
+rotation = i*120;
+//printf("|%d|\n", i);
+
+//base_x[i] = (cos(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius-robot_bottom_platform_triangle_radius));
+//base_y[i] = (sin(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius-robot_bottom_platform_triangle_radius));
+//base_z[i] = 0;
+
+base_x[i] = (cos(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius));
+base_y[i] = (sin(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius));
+base_z[i] = 0;
+
+base_calc_x[i] = (cos(rotation*pion180)) * ((robot_top_platform_triangle_radius-robot_bottom_platform_triangle_radius));
+base_calc_y[i] = (sin(rotation*pion180)) * ((robot_top_platform_triangle_radius-robot_bottom_platform_triangle_radius));
+base_calc_z[i] = 0;
+
+j_x[i] = (((cos(rotation*pion180)))*(robot_top_arm_length*cos(robot_angles[i]*pion180)))+base_calc_x[i];
+j_y[i] = (((sin(rotation*pion180)))*(robot_top_arm_length*cos(robot_angles[i]*pion180)))+base_calc_y[i];
+j_z[i] = 0 - (robot_top_arm_length*sin(robot_angles[i]*pion180));
+
+j_real_x[i] = (((cos(rotation*pion180)))*(robot_top_arm_length*cos(robot_angles[i]*pion180)))+base_x[i];
+j_real_y[i] = (((sin(rotation*pion180)))*(robot_top_arm_length*cos(robot_angles[i]*pion180)))+base_y[i];
+j_real_z[i] = 0 - (robot_top_arm_length*sin(robot_angles[i]*pion180));
+
+//j_y[i] = (sin(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius-robot_bottom_platform_triangle_radius) + (cos((robot_angles[i])*(3.1415/180.0))*robot_top_arm_length));
+//j_z[i] = (sin((0-robot_angles[i])*(3.1415/180.0))*robot_top_arm_length);
+
+//j_x[i] = (cos(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius-robot_bottom_platform_triangle_radius) + (cos((robot_angles[i])*(3.1415/180.0))*robot_top_arm_length));
+//j_y[i] = (sin(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius-robot_bottom_platform_triangle_radius) + (cos((robot_angles[i])*(3.1415/180.0))*robot_top_arm_length));
+//j_z[i] = (sin((0-robot_angles[i])*(3.1415/180.0))*robot_top_arm_length);
+
+//j_real_x[i] = (cos(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius) + (cos((0-robot_angles[i])*(3.1415/180.0))*robot_top_arm_length));
+//j_real_y[i] = (sin(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius) + (cos((0-robot_angles[i])*(3.1415/180.0))*robot_top_arm_length));
+//j_real_z[i] = (sin((0-robot_angles[i])*(3.1415/180.0))*robot_top_arm_length);
+/*
+j_x[i] = (cos(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius) + (cos((0-robot_angles[i])*(3.1415/180.0))*robot_top_arm_length));
+j_y[i] = (sin(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius) + (cos((0-robot_angles[i])*(3.1415/180.0))*robot_top_arm_length));
+j_z[i] = (sin((0-robot_angles[i])*(3.1415/180.0))*robot_top_arm_length);
+*/
+};
+//for use
+p1.x = j_x[0];
+p1.y = j_y[0];
+p1.z = j_z[0];
+r1 = robot_bottom_arm_length;
+p2.x = j_x[1];
+p2.y = j_y[1];
+p2.z = j_z[1];
+r2 = robot_bottom_arm_length;
+p3.x = j_x[2];
+p3.y = j_y[2];
+p3.z = j_z[2];
+r3 = robot_bottom_arm_length;
+
+//
+// Calculate the vector positions.
+// Changes o1 and o2 vectors only.
+//
+calculate_vectors(p1, p2, p3, r1, r2, r3);
+
+
+//
+// Determines which Z value to use. Use the lowest Z value.
+//
+if (o1.z < 0){
+ee[0] = o1.x;
+ee[1] = o1.y;
+ee[2] = o1.z;
+} else {
+ee[0] = o2.x;
+ee[1] = o2.y;
+ee[2] = o2.z;
+}
+
+for (int i=0; i < 3; i++){ // run through each slice using newly calculated vectors.
+rotation = i*120;
+//
+//calculate the final joint position to the end effector, end_xyz.
+//
+end_x[i] = (cos(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius-robot_bottom_platform_triangle_radius));
+end_y[i] = (sin(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius-robot_bottom_platform_triangle_radius));
+end_z[i] = ee[2];
+
+}
+
 return 0;
 };
  
@@ -165,6 +448,7 @@ if (theAction == GLFW_PRESS){
     case 'S': holdingS = 1; break;
     case 'A': holdingA = 1; break;
     case 'D': holdingD = 1; break;
+    case 'C': holdingC = 1; break;
     case 'Q': holdingQ = 1; break;
     case 'E': holdingE = 1; break;
     case 'P': holdingP = 1; break;
@@ -181,6 +465,7 @@ if (theAction == GLFW_PRESS){
     case 'S': holdingS = 0; break;
     case 'A': holdingA = 0; break;
     case 'D': holdingD = 0; break;
+    case 'C': holdingC = 0; break;
     case 'Q': holdingQ = 0; break;
     case 'E': holdingE = 0; break;
     case 'P': holdingP = 0; break;
@@ -281,6 +566,7 @@ if(view_lookfrom_x_linear > 180){
 // Changes the angles with keys.
 // #############################
 if(holdingI) { if(robot_angles[0] < 89) {robot_angles[0] +=0.5; }; };
+//if(holdingI) { if(robot_angles[0] < 89) {robot_angles[0] =70; }; };
 if(holdingJ) { if(robot_angles[0] > 0) {robot_angles[0] -=0.5; }; };
 
 if(holdingO) { if(robot_angles[1] < 89) {robot_angles[1] +=0.5; }; };

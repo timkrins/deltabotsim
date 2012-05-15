@@ -19,7 +19,7 @@ const int fs_window_width = 1366, fs_window_height = 768;
 float colors[4];
 float current_position[16];
 char sprinter[50];
-int holdingW, holdingS, holdingA, holdingD, holdingQ, holdingE, holdingI, holdingJ, holdingO, holdingK, holdingP, holdingL;
+int holdingW, holdingS, holdingA, holdingC, holdingD, holdingQ, holdingE, holdingI, holdingJ, holdingO, holdingK, holdingP, holdingL;
 float rotation = 0;
 GLUquadric *quadSphere;
 GLUquadric *quadCylinder;
@@ -70,13 +70,14 @@ float robot_top_arm_connector_width = 0.6f;
 float robot_mid_connector_radius = 0.5f;
 float robot_mid_connector_width = 5.0f;
 
-float robot_bottom_arm_length = 10.0f;
+float robot_bottom_arm_length = 40.0f;
 float robot_bottom_arm_radius = 5.0f;
 
-float robot_bottom_platform_triangle_radius = 10.0f;
+float robot_bottom_platform_triangle_radius = 5.0f;
+//float robot_bottom_platform_triangle_radius = 0.0f;
 float robot_bottom_platform_thickness = 3.0f;
 
-float robot_angles[] = { 89.0f, 89.0f, 89.0f };
+float robot_angles[] = { 70.0f, 70.0f, 70.0f };
 float robot_joint2[3];
 float robot_arm_first_angles[] = {90, 90, 90}; // the side on rotation
 float robot_arm_second_angles[] = {20, 20, 20}; // the forward facing rotation
@@ -116,6 +117,37 @@ float color_blue;
 float v_x[20];
 float v_y[20];
 float v_z[20];
+
+//for calculations
+// j is the centroid of the spheres. (the elbow connectors)
+float j_x[3];
+float j_y[3];
+float j_z[3];
+
+float j_real_x[3];
+float j_real_y[3];
+float j_real_z[3];
+
+float base_x[3];
+float base_y[3];
+float base_z[3];
+
+float base_calc_x[3];
+float base_calc_y[3];
+float base_calc_z[3];
+
+float end_x[3];
+float end_y[3];
+float end_z[3];
+
+float ee[3];
+vec3d p1, p2, p3;
+float  r1, r2, r3;
+float rotation_2;
+
+float robot_plat_effector[3][3];
+//float robot_plat_effector_2[3];
+//float robot_plat_effector_3[3];
 
 void variables_init(void){
 // #######################################################
