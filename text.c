@@ -65,7 +65,7 @@ glRasterPos2f(xpos ,line_pos(pos));   printString(charlies);
 
 char * make_text(float number_float){
 memset(sprinter, 0, sizeof(sprinter));
-sprintf(sprinter, "%.2f", number_float);
+sprintf(sprinter, "%.4f", number_float);
 return sprinter;
 }
 
@@ -94,7 +94,7 @@ go back to whereever you were.
     centre_align_text(0, "W,A,S,D,Q,E,I,J,O,K,P,L");
     
     
-    int current_line_height = 30;
+    int current_line_height = 40;
     char text_str[50];
         
     glColor3f(0.8, 0.8, 0.8);
@@ -147,6 +147,32 @@ go back to whereever you were.
     right_align_text(current_line_height--, text_str);
     memset(text_str, 0, sizeof(text_str));
     
+        current_line_height--;
+    
+    glColor3f(0.8, 0.8, 0.8);
+    right_align_text(current_line_height--, "Third Angles:");
+    glColor3f(0.1, 0.9, 0.1);
+
+    strcat(text_str,"One ");
+    strcat(text_str, make_text(robot_arm_second_angles[0]));
+    strcat(text_str," degrees.");
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    glColor3f(0.1, 0.1, 0.9);
+    strcat(text_str,"Two ");
+    strcat(text_str, make_text(robot_arm_second_angles[1]));
+    strcat(text_str," degrees.");
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    glColor3f(0.9, 0.1, 0.1);
+    strcat(text_str,"Three ");
+    strcat(text_str, make_text(robot_arm_second_angles[2]));
+    strcat(text_str," degrees.");
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
     current_line_height--;
     
     glColor3f(0.8, 0.8, 0.8);
@@ -167,6 +193,21 @@ go back to whereever you were.
     strcat(text_str, make_text(top_eqns[2]));
     right_align_text(current_line_height--, text_str);
     memset(text_str, 0, sizeof(text_str));
+        glColor3f(0.5, 0.9, 0.5);
+    strcat(text_str,"Top2ndEqn = ");
+    strcat(text_str, make_text(top_2nd_eqn[0]));
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    glColor3f(0.5, 0.5, 0.9);
+    strcat(text_str,"Top2ndEqn = ");
+    strcat(text_str, make_text(top_2nd_eqn[1]));
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    glColor3f(0.9, 0.5, 0.5);
+    strcat(text_str,"Top2ndEqn = ");
+    strcat(text_str, make_text(top_2nd_eqn[2]));
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
     
     glColor3f(0.5, 0.9, 0.5);
     strcat(text_str,"BtmEqn = ");
@@ -185,19 +226,209 @@ go back to whereever you were.
     memset(text_str, 0, sizeof(text_str));
     
     glColor3f(0.5, 0.9, 0.5);
-    strcat(text_str,"TotalEqn = ");
+    strcat(text_str,"Total1Eqn = ");
     strcat(text_str, make_text(entire_eqn[0]));
     right_align_text(current_line_height--, text_str);
     memset(text_str, 0, sizeof(text_str));
     glColor3f(0.5, 0.5, 0.9);
-    strcat(text_str,"TotalEqn = ");
+    strcat(text_str,"Total1Eqn = ");
     strcat(text_str, make_text(entire_eqn[1]));
     right_align_text(current_line_height--, text_str);
     memset(text_str, 0, sizeof(text_str));
     glColor3f(0.9, 0.5, 0.5);
-    strcat(text_str,"TotalEqn = ");
+    strcat(text_str,"Total1Eqn = ");
     strcat(text_str, make_text(entire_eqn[2]));
     right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+        glColor3f(0.5, 0.9, 0.5);
+    strcat(text_str,"Total2Eqn = ");
+    strcat(text_str, make_text(entire_2nd_eqn[0]));
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    glColor3f(0.5, 0.5, 0.9);
+    strcat(text_str,"Total2Eqn = ");
+    strcat(text_str, make_text(entire_2nd_eqn[1]));
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    glColor3f(0.9, 0.5, 0.5);
+    strcat(text_str,"Total2Eqn = ");
+    strcat(text_str, make_text(entire_2nd_eqn[2]));
+    right_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    
+        current_line_height--;
+        glColor3f(0.8, 0.8, 0.8);
+    right_align_text(current_line_height--, make_text(frame));
+    
+    
+    current_line_height = 43;
+    
+    glColor3f(0.1, 0.9, 0.1);
+    strcat(text_str,"J (");
+    strcat(text_str, make_text(j_x[0]));
+    strcat(text_str,",");
+    strcat(text_str, make_text(j_y[0]));
+    strcat(text_str,",");
+    strcat(text_str, make_text(j_z[0]));
+    strcat(text_str,")");
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    glColor3f(0.1, 0.1, 0.9);
+    strcat(text_str,"J (");
+    strcat(text_str, make_text(j_x[1]));
+    strcat(text_str,",");
+    strcat(text_str, make_text(j_y[1]));
+    strcat(text_str,",");
+    strcat(text_str, make_text(j_z[1]));
+    strcat(text_str,")");
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    glColor3f(0.9, 0.1, 0.1);
+    strcat(text_str,"J (");
+    strcat(text_str, make_text(j_x[2]));
+    strcat(text_str,",");
+    strcat(text_str, make_text(j_y[2]));
+    strcat(text_str,",");
+    strcat(text_str, make_text(j_z[2]));
+    strcat(text_str,")");
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    current_line_height--;
+    
+    glColor3f(0.8, 0.8, 0.8);
+    strcat(text_str,"EE (");
+    strcat(text_str, make_text(ee[0]));
+    strcat(text_str,",");
+    strcat(text_str, make_text(ee[1]));
+    strcat(text_str,",");
+    strcat(text_str, make_text(ee[2]));
+    strcat(text_str,")");
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    current_line_height--;
+    //sinXj1x[currentslice]
+    
+    glColor3f(0.5, 0.9, 0.5);
+    strcat(text_str,"ratioXnoY ");
+    strcat(text_str, make_text(ratioXnoY[0]));
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    glColor3f(0.5, 0.5, 0.9);
+    strcat(text_str,"ratioXnoY ");
+    strcat(text_str, make_text(ratioXnoY[1]));
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    glColor3f(0.9, 0.5, 0.5);
+    strcat(text_str,"ratioXnoY ");
+    strcat(text_str, make_text(ratioXnoY[2]));
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    current_line_height--;
+    //cosXj1y[currentslice]
+    
+    glColor3f(0.5, 0.9, 0.5);
+    strcat(text_str,"ratioYnoX ");
+    strcat(text_str, make_text(ratioYnoX[0]));
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    glColor3f(0.5, 0.5, 0.9);
+    strcat(text_str,"ratioYnoX ");
+    strcat(text_str, make_text(ratioYnoX[1]));
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    glColor3f(0.9, 0.5, 0.5);
+    strcat(text_str,"ratioYnoX ");
+    strcat(text_str, make_text(ratioYnoX[2]));
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    current_line_height--;
+    //cosXj1y[currentslice]
+    
+    glColor3f(0.5, 0.9, 0.5);
+    strcat(text_str,"j_x_times_x_ratio ");
+    strcat(text_str, make_text(j_x_times_x_ratio[0]));
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    glColor3f(0.5, 0.5, 0.9);
+    strcat(text_str,"j_x_times_x_ratio ");
+    strcat(text_str, make_text(j_x_times_x_ratio[1]));
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    glColor3f(0.9, 0.5, 0.5);
+    strcat(text_str,"j_x_times_x_ratio ");
+    strcat(text_str, make_text(j_x_times_x_ratio[2]));
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    current_line_height--;
+    glColor3f(0.5, 0.9, 0.5);
+    strcat(text_str,"j_y_times_y_ratio ");
+    strcat(text_str, make_text(j_y_times_y_ratio[0]));
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    glColor3f(0.5, 0.5, 0.9);
+    strcat(text_str,"j_y_times_y_ratio ");
+    strcat(text_str, make_text(j_y_times_y_ratio[1]));
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    glColor3f(0.9, 0.5, 0.5);
+    strcat(text_str,"j_y_times_y_ratio ");
+    strcat(text_str, make_text(j_y_times_y_ratio[2]));
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+        current_line_height--;
+    glColor3f(0.5, 0.9, 0.5);
+    strcat(text_str,"r_y_n_x/r_x_n_y ");
+    strcat(text_str, make_text(ratioYnoX[0]/ratioXnoY[0]));
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    glColor3f(0.5, 0.5, 0.9);
+    strcat(text_str,"r_y_n_x/r_x_n_y ");
+    strcat(text_str, make_text(ratioYnoX[1]/ratioXnoY[1]));
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    glColor3f(0.9, 0.5, 0.5);
+    strcat(text_str,"r_y_n_x/r_x_n_y ");
+    strcat(text_str, make_text(ratioYnoX[2]/ratioXnoY[2]));
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+        glColor3f(0.5, 0.5, 0.9);
+        strcat(text_str,"r_x_n_y/r_y_n_x ");
+    strcat(text_str, make_text(ratioXnoY[1]/ratioYnoX[1]));
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    glColor3f(0.9, 0.5, 0.5);
+        strcat(text_str,"r_x_n_y/r_y_n_x ");
+    strcat(text_str, make_text(ratioXnoY[2]/ratioYnoX[2]));
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    
+    current_line_height--;
+    glColor3f(0.5, 0.9, 0.5);
+    strcat(text_str,"j_y_t_y_r/j_x_t_x_r ");
+    strcat(text_str, make_text(j_y_times_y_ratio[0]/j_x_times_x_ratio[0]));
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    glColor3f(0.5, 0.5, 0.9);
+    strcat(text_str,"j_y_t_y_r/j_x_t_x_r ");
+    strcat(text_str, make_text(j_y_times_y_ratio[1]/j_x_times_x_ratio[1]));
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    glColor3f(0.9, 0.5, 0.5);
+    strcat(text_str,"j_y_t_y_r/j_x_t_x_r ");
+    strcat(text_str, make_text(j_y_times_y_ratio[2]/j_x_times_x_ratio[2]));
+    left_align_text(current_line_height--, text_str);
     memset(text_str, 0, sizeof(text_str));
     
  /* glColor3f(0.1, 0.9, 0.1);

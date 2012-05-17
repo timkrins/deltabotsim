@@ -17,6 +17,8 @@ const int fs_window_width = 1366, fs_window_height = 768;
 // set up software variables
 
 float colors[4];
+int frame = 0;
+int debug = 0;
 float current_position[16];
 char sprinter[50];
 int holdingW, holdingS, holdingA, holdingC, holdingD, holdingQ, holdingE, holdingI, holdingJ, holdingO, holdingK, holdingP, holdingL;
@@ -72,7 +74,7 @@ float robot_mid_connector_radius = 0.5f;
 float robot_mid_connector_width = 5.0f;
 
 float robot_bottom_arm_length = 40.0f;
-float robot_bottom_arm_radius = 5.0f;
+float robot_bottom_arm_radius = 1.0f;
 
 float robot_bottom_platform_triangle_radius = 5.0f;
 //float robot_bottom_platform_triangle_radius = 0.0f;
@@ -142,8 +144,19 @@ float end_y[3];
 float end_z[3];
 
 float top_eqns[3];
+float top_2nd_eqn[3];
 float btm_eqns[3];
+float btm_2nd_eqns[3];
 float entire_eqn[3];
+float entire_2nd_eqn[3];
+
+float ratioXnoY[3];
+float ratioYnoX[3];
+
+float j_x_times_x_ratio[3];
+float j_y_times_y_ratio[3];
+float jonez[3];
+
 
 float ee[3];
 vec3d p1, p2, p3;

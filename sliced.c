@@ -400,7 +400,9 @@ glPolygonMode(GL_FRONT, GL_FILL);
 glPolygonMode(GL_BACK, GL_FILL);
 glLoadIdentity();
 float aspect_ratio = ((float)window_height) / window_width;
+
 glFrustum(.5, -.5, -.5 * aspect_ratio, .5 * aspect_ratio, 1, 500);
+
 glMatrixMode(GL_MODELVIEW);
 glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ); // Preset color
 makeBitmapFonts();
@@ -596,7 +598,9 @@ void graphics_draw(void) {
 // ###############################################
 glLoadIdentity();
 update_view();
-gluLookAt(view_lookfrom_x, view_lookfrom_y, view_lookfrom_z,view_lookat_x, view_lookat_y, view_lookat_z,0.0f, view_orientation, 0.0f);
+//view_lookat_y -= robot_top_arm_length;
+//view_lookfrom_y -= robot_top_arm_length;
+gluLookAt(view_lookfrom_x, view_lookfrom_y - robot_top_arm_length, view_lookfrom_z,view_lookat_x, view_lookat_y - robot_top_arm_length, view_lookat_z,0.0f, view_orientation, 0.0f);
 // !!!!!!!!!!!!!!!!!!!!!!
 // Draw all things here.
 // !!!!!!!!!!!!!!!!!!!!!!
@@ -611,8 +615,12 @@ void graphics_loop(void) {
 // #############################################################
 // This is the loop that swaps the buffers and draws the screen.
 // #############################################################
-while(glfwGetWindowParam(GLFW_ACTIVE)){
-  glfwSleep(0.008);
+while(glfwGetWindowParam(GLFW_OPENED)){
+  glfwSleep(0.01);
+  if(glfwGetWindowParam(GLFW_ACTIVE) == GL_FALSE){
+  glfwSleep(0.5);
+  };
+  frame++;
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   graphics_draw();
   glfwSwapBuffers();

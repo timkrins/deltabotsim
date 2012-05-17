@@ -237,9 +237,43 @@ robot_joint2[2] = j_z[currentslice]; //Z
 //!!!!! no fabs! Correct!
 top_eqns[currentslice] = ((j_x[currentslice]-ee[0])*cos((currentslice*120.0)*pion180)) + ((j_y[currentslice]-ee[1])*sin((currentslice*120.0)*pion180));
 
+//Angle 1 is correct!
+//But Angle 2 and Angle 3 should also equal zero when they are the same.
+//top_2nd_eqn[currentslice] = ((j_x[currentslice]-ee[0])*sin((currentslice*120.0)*pion180)) + ((j_y[currentslice]-ee[1])*cos((currentslice*120.0)*pion180));
+//                                 
+
+
+top_2nd_eqn[currentslice] = ((j_x[currentslice]-ee[0])*sin((currentslice*120.0)*pion180))
+                            -
+                            ((j_y[currentslice]-ee[1])*cos((currentslice*120.0)*pion180));
+
+
+
+ratioXnoY[currentslice] = cos((currentslice*120.0)*pion180);
+ratioYnoX[currentslice] = sin((currentslice*120.0)*pion180);
+
+
+
+
+
+j_x_times_x_ratio[currentslice] = ratioXnoY[currentslice] * j_x[currentslice];
+j_y_times_y_ratio[currentslice] = ratioYnoX[currentslice] * j_y[currentslice];
+jonez[currentslice] = j_z[currentslice];
+
+
+
 btm_eqns[currentslice] = (fabs(ee[2])-fabs(j_z[currentslice]));
+btm_2nd_eqns[currentslice] = ((j_z[currentslice])-ee[2]);
+
 entire_eqn[currentslice] = top_eqns[currentslice]/btm_eqns[currentslice];
+
+entire_2nd_eqn[currentslice] = top_2nd_eqn[currentslice]/btm_2nd_eqns[currentslice];
+
 robot_arm_first_angles[currentslice] =  90+atan(entire_eqn[currentslice])/pion180;
+
+robot_arm_second_angles[currentslice] =  atan(entire_2nd_eqn[currentslice])/pion180;
+
+
 //robot_arm_second_angles[currentslice] = atan((((ee[1]-j_y[currentslice])/sin((currentslice*120.0)*pion180)))/(fabs(ee[2])-fabs(j_z[currentslice])))/pion180;
 
 //#robot_arm_first_angles[currentslice] =  atan((((j_x[currentslice]-ee[0])/cos((currentslice*120.0)*pion180)))/(fabs(ee[2])-fabs(j_z[currentslice])))/pion180;
@@ -252,36 +286,6 @@ robot_arm_first_angles[currentslice] =  90+atan(entire_eqn[currentslice])/pion18
 
 //robot_arm_second_angles[currentslice] = atan((robot_joint2[0]-robot_end_effector[0])/(robot_end_effector[1]-robot_joint2[2]))/pion180;
 
-if((holdingC)){
-
-printf("Slice Number: %d\nSlice Angle:%f\n\n", currentslice, currentslice*120.0);
-
-
-printf("First Slice Calculations:\n\n");
-printf("BaseJoin X %f, Y %f, Z %f\n", base_x[currentslice], base_y[currentslice], base_z[currentslice]);
-printf("Angle %f\n", robot_angles[currentslice]);
-printf("Joint REAL X %f, Y %f, Z %f\n", j_real_x[currentslice], j_real_y[currentslice], j_real_z[currentslice]);
-printf("Joint X %f, Y %f, Z %f\n", j_x[currentslice], j_y[currentslice], j_z[currentslice]);
-printf("NextAngle fabs %f\n", (robot_arm_first_angles[currentslice]));
-printf("NextAngle fabs Plus90  %f\n", (robot_arm_first_angles[currentslice])+90);
-printf("########################## FinalAngle fabs %f\n", (robot_arm_second_angles[currentslice]));
-printf("EndEffectorJoinBase X %f, Y %f, Z %f\n", end_x[currentslice],end_y[currentslice], end_z[currentslice]);
-printf("EndEffectorCenter X %f, Y %f, Z %f\n\n", ee[0],ee[1], ee[2]);
-
-printf("Tangent: %f\n", (j_real_x[currentslice]-end_x[currentslice])/
-                             (fabs(end_z[currentslice])-fabs(j_real_z[currentslice])));
-                             
-printf("Cosine Current Angle: %f\n\n",cos((currentslice*120.0)*pion180));
-                             
-printf("Top Half of Eqn: %f\n",j_x[currentslice]);
-
-printf("Bottom Half of Eqn First with fabs: %f\n",fabs(ee[2]));
-printf("Bottom Half of Eqn Second with fabs: %f\n",fabs(j_z[currentslice]));
-
-//printf("Bottom Half of Eqn Undivided: %f\n",(fabs(end_z[currentslice])-fabs(j_real_z[currentslice])));
-printf("Bottom Half of Eqn: %f\n",(fabs(ee[2])-fabs(j_z[currentslice])));
-printf("________________________________________________________________\n\n");
-};
 
 multi = multi/1.2; glColor3f(color_red*multi, color_green*multi, color_blue*multi);
 //glTranslatef(0, 0, robot_top_arm_length);
@@ -290,7 +294,6 @@ gluSphere(quadSphere, 1, 32, 16);
 glRotatef(robot_arm_first_angles[currentslice],1,0,0); // angle it down.
 //glRotatef(robot_arm_first_angles[currentslice]+90,1,0,0); // angle it down.
 multi = multi/1.2; glColor3f(color_red*multi, color_green*multi, color_blue*multi);
-//glRotatef(robot_arm_first_angles[currentslice],1,0,0); // angle it down.
 glRotatef(robot_arm_second_angles[currentslice],0,1,0); // angle it sideways.
 draw_cuboid(robot_top_arm_width, robot_top_arm_height, robot_bottom_arm_length);
 }
