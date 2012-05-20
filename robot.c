@@ -58,21 +58,31 @@ calculate();
 
 //simple_base(0);
 complex_base(0);
-simple_base(1);
-simple_base(2);
+//simple_base(1);
+complex_base(1);
+//simple_base(2);
+complex_base(2);
 
-simple_top_arm(0);
-simple_top_arm(1);
-simple_top_arm(2);
+//simple_top_arm(0);
+complex_top_arm(0);
+//simple_top_arm(1);
+complex_top_arm(1);
+//simple_top_arm(2);
+complex_top_arm(2);
 
-simple_bot_arm(0);
-simple_bot_arm(1);
-simple_bot_arm(2);
+//simple_bot_arm(0);
+complex_bot_arm(0);
+//simple_bot_arm(1);
+complex_bot_arm(1);
+//simple_bot_arm(2);
+complex_bot_arm(2);
 
-simple_ee(0);
-simple_ee(1);
-simple_ee(2);
-
+//simple_ee(0);
+complex_ee(0);
+//simple_ee(1);
+complex_ee(1);
+//simple_ee(2);
+complex_ee(2);
 
 glPopMatrix();
 }
@@ -98,21 +108,26 @@ vec3d a = {0, 0, 0};
 vec3d b = {base_y[i], base_z[i], base_x[i]};
 // This is the default direction for the cylinders to face in OpenGL
 vec3d z = { 0 , 0 , 1 };
-// Get diff between two points you want cylinder along
+// Get diff between two points.
 vec3d p = vector_minus(a, b);
 // Get cross product (for the axis of rotation)
 vec3d t = vector_crossProduct(z, p);
-// Get dot product
-int d = vector_dotProduct(z,p);
-int m = vector_magnitude(p);
-// Get angle. LENGTH is magnitude of the vector
+// Get dot product of the vectors
+float d = vector_dotProduct(z,p);
+// Get the magnitude of the vector (its length)
+float m = vector_magnitude(p);
+// Get angle of rotation.
 double angle = (180/PI*acos(d/m));
 if(holdingC == 1){
+printf("Rotation: %f\n", i*120.0);
+printf("Origin vector: x%f, y%f, z%f\n", a.x, a.y, a.z);
+printf("End vector: x%f, y%f, z%f\n", b.x, b.y, b.z);
 printf("P vector: x%f, y%f, z%f\n", p.x, p.y, p.z);
-printf("P magnitude: %f\n", m);
+printf("P magnitude: %f\n\n", m);
 }
 glTranslated(b.x,b.y,b.z);
 glRotated(angle,t.x,t.y,t.z);
+//draws back towards the origin.
 draw_closed_cylinder(robot_top_arm_width,m);
 glPopMatrix();
 }
@@ -129,6 +144,39 @@ glEnd();
 glPopMatrix();
 }
 
+void complex_top_arm(int i){
+glPushMatrix();
+if(i == 0) { glColor3f(.8, .1, .1); }
+if(i == 1) { glColor3f(.1, .8, .1); }
+if(i == 2) { glColor3f(.1, .1, .8); }
+vec3d a = {base_y[i], base_z[i], base_x[i]};
+vec3d b = {j_real_y[i], j_real_z[i], j_real_x[i]};
+// This is the default direction for the cylinders to face in OpenGL
+vec3d z = { 0 , 0 , 1 };
+// Get diff between two points.
+vec3d p = vector_minus(a, b);
+// Get cross product (for the axis of rotation)
+vec3d t = vector_crossProduct(z, p);
+// Get dot product of the vectors
+float d = vector_dotProduct(z,p);
+// Get the magnitude of the vector (its length)
+float m = vector_magnitude(p);
+// Get angle of rotation.
+double angle = (180/PI*acos(d/m));
+if(holdingC == 1){
+printf("Rotation: %f\n", i*120.0);
+printf("Origin vector: x%f, y%f, z%f\n", a.x, a.y, a.z);
+printf("End vector: x%f, y%f, z%f\n", b.x, b.y, b.z);
+printf("P vector: x%f, y%f, z%f\n", p.x, p.y, p.z);
+printf("P magnitude: %f\n\n", m);
+}
+glTranslated(b.x,b.y,b.z);
+glRotated(angle,t.x,t.y,t.z);
+//draws back towards the origin.
+draw_closed_cylinder(robot_top_arm_width,m);
+glPopMatrix();
+}
+
 void simple_bot_arm(int i){
 glPushMatrix();
 if(i == 0) { glColor3f(.6, .1, .1); }
@@ -142,6 +190,39 @@ glEnd();
 glPopMatrix();
 }
 
+void complex_bot_arm(int i){
+glPushMatrix();
+if(i == 0) { glColor3f(.8, .1, .1); }
+if(i == 1) { glColor3f(.1, .8, .1); }
+if(i == 2) { glColor3f(.1, .1, .8); }
+vec3d a = {j_real_y[i], j_real_z[i], j_real_x[i]};
+vec3d b = {eereal_y[i], eereal_z[i], eereal_x[i]};
+// This is the default direction for the cylinders to face in OpenGL
+vec3d z = { 0 , 0 , 1 };
+// Get diff between two points.
+vec3d p = vector_minus(a, b);
+// Get cross product (for the axis of rotation)
+vec3d t = vector_crossProduct(z, p);
+// Get dot product of the vectors
+float d = vector_dotProduct(z,p);
+// Get the magnitude of the vector (its length)
+float m = vector_magnitude(p);
+// Get angle of rotation.
+double angle = (180/PI*acos(d/m));
+if(holdingC == 1){
+printf("Rotation: %f\n", i*120.0);
+printf("Origin vector: x%f, y%f, z%f\n", a.x, a.y, a.z);
+printf("End vector: x%f, y%f, z%f\n", b.x, b.y, b.z);
+printf("P vector: x%f, y%f, z%f\n", p.x, p.y, p.z);
+printf("P magnitude: %f\n\n", m);
+}
+glTranslated(b.x,b.y,b.z);
+glRotated(angle,t.x,t.y,t.z);
+//draws back towards the origin.
+draw_closed_cylinder(robot_top_arm_width,m);
+glPopMatrix();
+}
+
 void simple_ee(int i){
 glPushMatrix();
 if(i == 0) { glColor3f(.4, .1, .1); }
@@ -151,6 +232,39 @@ glBegin(GL_LINES);
 glVertex3f(eereal_y[i], eereal_z[i], eereal_x[i]);
 glVertex3f(ee[1], ee[2], ee[0]);
 glEnd();
+glPopMatrix();
+}
+
+void complex_ee(int i){
+glPushMatrix();
+if(i == 0) { glColor3f(.8, .1, .1); }
+if(i == 1) { glColor3f(.1, .8, .1); }
+if(i == 2) { glColor3f(.1, .1, .8); }
+vec3d a = {eereal_y[i], eereal_z[i], eereal_x[i]};
+vec3d b = {ee[1], ee[2], ee[0]};
+// This is the default direction for the cylinders to face in OpenGL
+vec3d z = { 0 , 0 , 1 };
+// Get diff between two points.
+vec3d p = vector_minus(a, b);
+// Get cross product (for the axis of rotation)
+vec3d t = vector_crossProduct(z, p);
+// Get dot product of the vectors
+float d = vector_dotProduct(z,p);
+// Get the magnitude of the vector (its length)
+float m = vector_magnitude(p);
+// Get angle of rotation.
+double angle = (180/PI*acos(d/m));
+if(holdingC == 1){
+printf("Rotation: %f\n", i*120.0);
+printf("Origin vector: x%f, y%f, z%f\n", a.x, a.y, a.z);
+printf("End vector: x%f, y%f, z%f\n", b.x, b.y, b.z);
+printf("P vector: x%f, y%f, z%f\n", p.x, p.y, p.z);
+printf("P magnitude: %f\n\n", m);
+}
+glTranslated(b.x,b.y,b.z);
+glRotated(angle,t.x,t.y,t.z);
+//draws back towards the origin.
+draw_closed_cylinder(robot_top_arm_width,m);
 glPopMatrix();
 }
 

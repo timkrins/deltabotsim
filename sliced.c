@@ -61,9 +61,9 @@ void color_darken(void);
 
 typedef struct vec3d    vec3d;
 struct vec3d {
-        double  x;
-        double  y;
-        double  z;
+        float  x;
+        float  y;
+        float  z;
 };
 
 //##################################################

@@ -100,6 +100,7 @@ go back to whereever you were.
     glColor3f(0.8, 0.8, 0.8);
     right_align_text(current_line_height--, "First Angles:");
     glColor3f(0.1, 0.9, 0.1);
+    memset(text_str, 0, sizeof(text_str));
 
     strcat(text_str,"One ");
     strcat(text_str, make_text(robot_angles[0]));
