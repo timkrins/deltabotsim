@@ -10,6 +10,12 @@
 // Use IJOKPL to change the angles.
 // ###################################
 
+#define vector_crossProduct(b,c) { (b.y*c.z-c.y*b.z) , (b.z*c.x-c.z*b.x) , (b.x*c.y-c.x*b.y) }
+#define vector_minus(b,c) { (b.x-c.x), (b.y-c.y), (b.z-c.z) }
+#define vector_dotProduct(b,c) ((b.x*c.x)+(b.y*c.y)+(b.z*c.z))
+#define vector_magnitude(b) sqrt((b.x*b.x)+(b.y*b.y)+(b.z*b.z))
+#define PI 3.14159265
+
 void draw_delta_robot(void);
     void draw_slice(int current_slice);
         void draw_top(void);
@@ -28,6 +34,11 @@ void draw_delta_robot(void);
     void simple_top_arm(int i);
     void simple_bot_arm(int i);
     void simple_ee(int i); 
+    
+    void complex_base(int i);
+    void complex_top_arm(int i);
+    void complex_bot_arm(int i);
+    void complex_ee(int i); 
 
 void use_vertex(int vert);
 
@@ -45,7 +56,8 @@ glPushMatrix();
 
 calculate();
 
-simple_base(0);
+//simple_base(0);
+complex_base(0);
 simple_base(1);
 simple_base(2);
 
@@ -74,6 +86,34 @@ glBegin(GL_LINES);
 glVertex3f(0, 0, 0); // origin of the line
 glVertex3f(base_y[i], base_z[i], base_x[i]);
 glEnd();
+glPopMatrix();
+}
+
+void complex_base(int i){
+glPushMatrix();
+if(i == 0) { glColor3f(.8, .1, .1); }
+if(i == 1) { glColor3f(.1, .8, .1); }
+if(i == 2) { glColor3f(.1, .1, .8); }
+vec3d a = {0, 0, 0};
+vec3d b = {base_y[i], base_z[i], base_x[i]};
+// This is the default direction for the cylinders to face in OpenGL
+vec3d z = { 0 , 0 , 1 };
+// Get diff between two points you want cylinder along
+vec3d p = vector_minus(a, b);
+// Get cross product (for the axis of rotation)
+vec3d t = vector_crossProduct(z, p);
+// Get dot product
+int d = vector_dotProduct(z,p);
+int m = vector_magnitude(p);
+// Get angle. LENGTH is magnitude of the vector
+double angle = (180/PI*acos(d/m));
+if(holdingC == 1){
+printf("P vector: x%f, y%f, z%f\n", p.x, p.y, p.z);
+printf("P magnitude: %f\n", m);
+}
+glTranslated(b.x,b.y,b.z);
+glRotated(angle,t.x,t.y,t.z);
+draw_closed_cylinder(robot_top_arm_width,m);
 glPopMatrix();
 }
 
