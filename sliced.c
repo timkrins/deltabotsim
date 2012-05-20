@@ -238,19 +238,12 @@ vec3d   o1, o2;
 
 int calculate_vectors(vec3d p1, vec3d p2, vec3d p3, double r1, double r2, double r3){
         int     result;
-                //printf("Sphere 1: %g %g %g, radius %g\n", p1.x, p1.y, p1.z, r1);
-                //printf("Sphere 2: %g %g %g, radius %g\n", p2.x, p2.y, p2.z, r2);
-                //printf("Sphere 3: %g %g %g, radius %g\n\n", p3.x, p3.y, p3.z, r3);
                 result = trilateration(&o1, &o2, p1, r1, p2, r2, p3, r3, MAXZERO);
                 if (result){
-                        printf("No solution (%d).\n", result);
-                } else {
-                        //printf("Solution 1: %.3f %.3f %.3f\n", o1.x, o1.y, o1.z);
-                        //printf("Solution 2: %.3f %.3f %.3f\n\n", o2.x, o2.y, o2.z);
-                        
-                }
-
-}
+                        printf("No solution. Please check your robot dimensions.\n", result);
+                        quit();
+                };
+};
 
 int calculate_delta(void) {
 // ##################################################################
@@ -280,50 +273,35 @@ float yval0 = (a2*zval0 + b2)/dnm;
 
 */
 
-//
-// calculate the values for the base, base_xyz, the joint positions, j_xyz.
-//
+// ########################################################################
+// Calculate the values for the base, base_xyz, the joint positions, j_xyz.
+// ########################################################################
 for (int i=0; i < 3; i++){ // run through each slice
 rotation = i*120;
-//printf("|%d|\n", i);
 
-//base_x[i] = (cos(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius-robot_bottom_platform_triangle_radius));
-//base_y[i] = (sin(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius-robot_bottom_platform_triangle_radius));
-//base_z[i] = 0;
-
-base_x[i] = (cos(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius));
-base_y[i] = (sin(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius));
+//these real positions are only used for information.
+base_x[i] = (cos(rotation*pion180)) * ((robot_top_platform_triangle_radius));
+base_y[i] = (sin(rotation*pion180)) * ((robot_top_platform_triangle_radius));
 base_z[i] = 0;
 
+//these are 'fake' positions, used for calculations.
 base_calc_x[i] = (cos(rotation*pion180)) * ((robot_top_platform_triangle_radius-robot_bottom_platform_triangle_radius));
 base_calc_y[i] = (sin(rotation*pion180)) * ((robot_top_platform_triangle_radius-robot_bottom_platform_triangle_radius));
 base_calc_z[i] = 0;
 
+//these are 'fake' positions, used for calculations.
 j_x[i] = (((cos(rotation*pion180)))*(robot_top_arm_length*cos(robot_angles[i]*pion180)))+base_calc_x[i];
 j_y[i] = (((sin(rotation*pion180)))*(robot_top_arm_length*cos(robot_angles[i]*pion180)))+base_calc_y[i];
 j_z[i] = 0 - (robot_top_arm_length*sin(robot_angles[i]*pion180));
 
+
+// These real position are not used for calculations, only for information.
 j_real_x[i] = (((cos(rotation*pion180)))*(robot_top_arm_length*cos(robot_angles[i]*pion180)))+base_x[i];
 j_real_y[i] = (((sin(rotation*pion180)))*(robot_top_arm_length*cos(robot_angles[i]*pion180)))+base_y[i];
 j_real_z[i] = 0 - (robot_top_arm_length*sin(robot_angles[i]*pion180));
-
-//j_y[i] = (sin(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius-robot_bottom_platform_triangle_radius) + (cos((robot_angles[i])*(3.1415/180.0))*robot_top_arm_length));
-//j_z[i] = (sin((0-robot_angles[i])*(3.1415/180.0))*robot_top_arm_length);
-
-//j_x[i] = (cos(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius-robot_bottom_platform_triangle_radius) + (cos((robot_angles[i])*(3.1415/180.0))*robot_top_arm_length));
-//j_y[i] = (sin(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius-robot_bottom_platform_triangle_radius) + (cos((robot_angles[i])*(3.1415/180.0))*robot_top_arm_length));
-//j_z[i] = (sin((0-robot_angles[i])*(3.1415/180.0))*robot_top_arm_length);
-
-//j_real_x[i] = (cos(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius) + (cos((0-robot_angles[i])*(3.1415/180.0))*robot_top_arm_length));
-//j_real_y[i] = (sin(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius) + (cos((0-robot_angles[i])*(3.1415/180.0))*robot_top_arm_length));
-//j_real_z[i] = (sin((0-robot_angles[i])*(3.1415/180.0))*robot_top_arm_length);
-/*
-j_x[i] = (cos(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius) + (cos((0-robot_angles[i])*(3.1415/180.0))*robot_top_arm_length));
-j_y[i] = (sin(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius) + (cos((0-robot_angles[i])*(3.1415/180.0))*robot_top_arm_length));
-j_z[i] = (sin((0-robot_angles[i])*(3.1415/180.0))*robot_top_arm_length);
-*/
 };
-//for use
+
+// For use with the vector calculator.
 p1.x = j_x[0];
 p1.y = j_y[0];
 p1.z = j_z[0];
@@ -345,7 +323,7 @@ calculate_vectors(p1, p2, p3, r1, r2, r3);
 
 
 //
-// Determines which Z value to use. Use the lowest Z value.
+// Determines the lowest Z value of the vector calculations, and sets the End Effector positions.
 //
 if (o1.z < 0){
 ee[0] = o1.x;
@@ -357,15 +335,15 @@ ee[1] = o2.y;
 ee[2] = o2.z;
 }
 
-for (int i=0; i < 3; i++){ // run through each slice using newly calculated vectors.
+for (int i=0; i < 3; i++){
 rotation = i*120;
-//
-//calculate the final joint position to the end effector, end_xyz.
-//
-end_x[i] = (cos(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius-robot_bottom_platform_triangle_radius));
-end_y[i] = (sin(rotation*(3.1415/180.0))) * ((robot_top_platform_triangle_radius-robot_bottom_platform_triangle_radius));
-end_z[i] = ee[2];
 
+//
+// Calculates the real end-effector joint positions, used for calculating the elusive 4th angle.
+//
+eereal_x[i] = ((cos(rotation*(3.1415/180.0)))*(robot_bottom_platform_triangle_radius))+ee[0];
+eereal_y[i] = ((sin(rotation*(3.1415/180.0)))*(robot_bottom_platform_triangle_radius))+ee[1];
+eereal_z[i] = ee[2];
 }
 
 return 0;
@@ -419,20 +397,32 @@ void handleKeypress(int theKey, int theAction){
 // #################################################
 if (theAction == GLFW_PRESS){
     switch(theKey){
-    case 'W': holdingW = 1; break;
-    case 'S': holdingS = 1; break;
     case 'A': holdingA = 1; break;
-    case 'D': holdingD = 1; break;
+    case 'B': holdingB = 1; break;
     case 'C': holdingC = 1; break;
-    case 'Q': holdingQ = 1; break;
+    case 'D': holdingD = 1; break;
     case 'E': holdingE = 1; break;
-    case 'P': holdingP = 1; break;
-    case 'L': holdingL = 1; break;
-    case 'O': holdingO = 1; break;
-    case 'K': holdingK = 1; break;
+    case 'F': holdingF = 1; break;
+    case 'G': holdingG = 1; break;
+    case 'H': holdingH = 1; break;
     case 'I': holdingI = 1; break;
     case 'J': holdingJ = 1; break;
-    
+    case 'K': holdingK = 1; break;
+    case 'L': holdingL = 1; break;
+    case 'M': holdingM = 1; break;
+    case 'N': holdingN = 1; break;
+    case 'O': holdingO = 1; break;
+    case 'P': holdingP = 1; break;
+    case 'Q': holdingQ = 1; break;
+    case 'R': holdingR = 1; break;
+    case 'S': holdingS = 1; break;
+    case 'T': holdingT = 1; break;
+    case 'U': holdingU = 1; break;
+    case 'V': holdingV = 1; break;
+    case 'W': holdingW = 1; break;
+    case 'X': holdingX = 1; break;
+    case 'Y': holdingY = 1; break;
+    case 'Z': holdingZ = 1; break;
     case '1': holding1 = 1; break;
     case '2': holding2 = 1; break;
     case '3': holding3 = 1; break;
@@ -448,20 +438,32 @@ if (theAction == GLFW_PRESS){
     }
   } else {
     switch(theKey){
-    case 'W': holdingW = 0; break;
-    case 'S': holdingS = 0; break;
     case 'A': holdingA = 0; break;
-    case 'D': holdingD = 0; break;
+    case 'B': holdingB = 0; break;
     case 'C': holdingC = 0; break;
-    case 'Q': holdingQ = 0; break;
+    case 'D': holdingD = 0; break;
     case 'E': holdingE = 0; break;
-    case 'P': holdingP = 0; break;
-    case 'L': holdingL = 0; break;
-    case 'O': holdingO = 0; break;
-    case 'K': holdingK = 0; break;
+    case 'F': holdingF = 0; break;
+    case 'G': holdingG = 0; break;
+    case 'H': holdingH = 0; break;
     case 'I': holdingI = 0; break;
     case 'J': holdingJ = 0; break;
-    
+    case 'K': holdingK = 0; break;
+    case 'L': holdingL = 0; break;
+    case 'M': holdingM = 0; break;
+    case 'N': holdingN = 0; break;
+    case 'O': holdingO = 0; break;
+    case 'P': holdingP = 0; break;
+    case 'Q': holdingQ = 0; break;
+    case 'R': holdingR = 0; break;
+    case 'S': holdingS = 0; break;
+    case 'T': holdingT = 0; break;
+    case 'U': holdingU = 0; break;
+    case 'V': holdingV = 0; break;
+    case 'W': holdingW = 0; break;
+    case 'X': holdingX = 0; break;
+    case 'Y': holdingY = 0; break;
+    case 'Z': holdingZ = 0; break;
     case '1': holding1 = 0; break;
     case '2': holding2 = 0; break;
     case '3': holding3 = 0; break;
@@ -564,15 +566,17 @@ if(view_lookfrom_x_linear > 180){
 // #############################
 // Changes the angles with keys.
 // #############################
-if(holdingI) { if(robot_angles[0] < 89) {robot_angles[0] +=0.5; }; };
-//if(holdingI) { if(robot_angles[0] < 89) {robot_angles[0] =70; }; };
-if(holdingJ) { if(robot_angles[0] > 0) {robot_angles[0] -=0.5; }; };
+int maxangle = 95;
+int minangle = -60;
 
-if(holdingO) { if(robot_angles[1] < 89) {robot_angles[1] +=0.5; }; };
-if(holdingK) { if(robot_angles[1] > 0) {robot_angles[1] -=0.5; }; };
+if(holdingI) { if(robot_angles[0] < maxangle) {robot_angles[0] +=0.5; }; };
+if(holdingJ) { if(robot_angles[0] > minangle) {robot_angles[0] -=0.5; }; };
 
-if(holdingP) { if(robot_angles[2] < 89) {robot_angles[2] +=0.5; };};
-if(holdingL) { if(robot_angles[2] > 0) {robot_angles[2] -=0.5; }; };
+if(holdingO) { if(robot_angles[1] < maxangle) {robot_angles[1] +=0.5; }; };
+if(holdingK) { if(robot_angles[1] > minangle) {robot_angles[1] -=0.5; }; };
+
+if(holdingP) { if(robot_angles[2] < maxangle) {robot_angles[2] +=0.5; };};
+if(holdingL) { if(robot_angles[2] > minangle) {robot_angles[2] -=0.5; }; };
 
 if(holding0) {robot_angles[0] = 0; robot_angles[1] = 0; robot_angles[2] = 0;};
 
@@ -583,6 +587,17 @@ if(holding3) {robot_angles[2] = 70;};
 if(holding4) {robot_angles[0] = 45;};
 if(holding5) {robot_angles[1] = 45;};
 if(holding6) {robot_angles[2] = 45;};
+
+if(holding7) {robot_angles[0] = -50;};
+if(holding8) {robot_angles[1] = -50;};
+if(holding9) {robot_angles[2] = -50;};
+
+if(holdingB) {robot_angles[0] = -15;};
+if(holdingN) {robot_angles[1] = -10;};
+if(holdingM) {robot_angles[2] = -5;};
+
+if(holdingZ) {y_view = 0;};
+if(holdingX) {y_view = 0-ee[2];};
 
 // ###################################
 // Calculate the camera's coordinates.
@@ -600,15 +615,23 @@ glLoadIdentity();
 update_view();
 //view_lookat_y -= robot_top_arm_length;
 //view_lookfrom_y -= robot_top_arm_length;
-gluLookAt(view_lookfrom_x, view_lookfrom_y - robot_top_arm_length, view_lookfrom_z,view_lookat_x, view_lookat_y - robot_top_arm_length, view_lookat_z,0.0f, view_orientation, 0.0f);
+gluLookAt(view_lookfrom_x, view_lookfrom_y - y_view, view_lookfrom_z,view_lookat_x, view_lookat_y - y_view, view_lookat_z,0.0f, view_orientation, 0.0f);
+
+
 // !!!!!!!!!!!!!!!!!!!!!!
 // Draw all things here.
 // !!!!!!!!!!!!!!!!!!!!!!
+
+
 draw_delta_robot();
 draw_text_layers();
+
+
 // !!!!!!!!!!!!!!!!!!!!!!!!!
 // Stop drawing things here.
 // !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
 };
 
 void graphics_loop(void) {

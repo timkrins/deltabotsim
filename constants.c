@@ -21,7 +21,7 @@ int frame = 0;
 int debug = 0;
 float current_position[16];
 char sprinter[50];
-int holdingW, holdingS, holdingA, holdingC, holdingD, holdingQ, holdingE, holdingI, holdingJ, holdingO, holdingK, holdingP, holdingL;
+int holdingA, holdingB, holdingC, holdingD, holdingE, holdingF, holdingG, holdingH, holdingI, holdingJ, holdingK, holdingL, holdingM, holdingN, holdingO, holdingP, holdingQ, holdingR, holdingS, holdingT, holdingU, holdingV, holdingW, holdingX, holdingY, holdingZ;
 int holding0, holding1, holding2, holding3, holding4, holding5, holding6, holding7, holding8, holding9, holding0;
 float rotation = 0;
 GLUquadric *quadSphere;
@@ -75,15 +75,18 @@ float robot_mid_connector_width = 5.0f;
 
 float robot_bottom_arm_length = 40.0f;
 float robot_bottom_arm_radius = 1.0f;
+float robot_bottom_arm_height = 5.0f;
+float robot_bottom_arm_width = 0.3f;
 
 float robot_bottom_platform_triangle_radius = 5.0f;
 //float robot_bottom_platform_triangle_radius = 0.0f;
-float robot_bottom_platform_thickness = 3.0f;
+float robot_bottom_platform_thickness = 0.5f;
 
 float robot_angles[] = { 70.0f, 70.0f, 70.0f };
 float robot_joint2[3];
 float robot_arm_first_angles[] = {0,0,0}; // the side on rotation
 float robot_arm_second_angles[] = {0,0,0}; // the forward facing rotation
+float robot_fourth_angles[] = {0,0,0}; // top down rotation.
 
 float robot_end_effector[3];
 //float robot_end_effector_x;
@@ -91,10 +94,24 @@ float robot_end_effector[3];
 //float robot_end_effector_z;
 
 float multi = 1.0f;
+float y_view = 10;
+
+float len_a_a[3];
+float len_a_b[3];
+float len_a[3];
+
+float len_b_a[3];
+float len_b_b[3];
+float len_b[3];
+
+float len_c_a[3];
+float len_c_b[3];
+float len_c[3];
+float angle_a[3];
 
 // set view variables
 float view_lookat_x = 0.0f;
-float view_lookat_y = -5.0f;
+float view_lookat_y = 0;//-5.0f;
 float view_lookat_z = 0.0f;
 float view_lookfrom_divide_x = -5.0f;
 float view_lookfrom_divide_y = 5.0f;
@@ -142,6 +159,10 @@ float base_calc_z[3];
 float end_x[3];
 float end_y[3];
 float end_z[3];
+
+float eereal_x[3];
+float eereal_y[3];
+float eereal_z[3];
 
 float top_eqns[3];
 float top_2nd_eqn[3];
