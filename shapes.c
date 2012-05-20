@@ -1,7 +1,7 @@
-/*|_|_|_ __ ___ | | ___ __|_|_ __  ___ 
-| _|| | '_ ` _ \| |/ / '__|@|a'_ \/ __|
-| |_| | | | | | |   <| |  |g|i| | \__ \
- \__|_|_| |_| |_|_|\_\_|  |m|l| |_|__*/
+/*|_|_|_ __ _(c)|2| ___ __|_|_ __  ___ 
+| _|| | '_ ` _ \|0|/ / '__|@|a'_ \/ __|
+| |_| | | | | | |1  <| |  |g|i| | \__ \
+ \__|_|_| |_| | |2|\ \ |  |m|l| |_|__*/
 
 // ###################################
 // This is a delta robot simulator.
@@ -10,10 +10,24 @@
 // Use IJOKPL to change the angles.
 // ###################################
 
+// prototype generic drawing routines. these start at (0,0,0) centered and in the +z.
+
 void draw_sphere(float radius);
 void draw_cuboid(float width, float height, float length);
 void draw_closed_cylinder(float radius, float length);
 void draw_centered_closed_cylinder(float radius, float length);
+
+//prototype generic coloring routines
+
+void color_darken(void);
+
+void color_darken(void){
+// ###################################
+// Darkens the current drawing colour.
+// ###################################
+glGetFloatv(GL_CURRENT_COLOR, colors);
+glColor3f(colors[0]*0.95f, colors[1]*0.95f, colors[2]*0.95f);
+};
 
 void draw_closed_cylinder(float radius, float length){
 // ###################################
@@ -38,6 +52,14 @@ glPushMatrix();
 glTranslatef(0,0,-(length/2));
 draw_closed_cylinder(radius, length);
 glPopMatrix();
+}
+
+
+void draw_sphere(float radius){
+// ###################################
+// Draws a [centered on zero] sphere.
+// ###################################
+gluSphere(quadSphere, radius, 32, 16);
 }
 
 void draw_cuboid(float width, float height, float length){

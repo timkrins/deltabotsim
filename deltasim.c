@@ -1,7 +1,7 @@
-/*|_|_|_ __ ___ | | ___ __|_|_ __  ___ 
-| _|| | '_ ` _ \| |/ / '__|@|a'_ \/ __|
-| |_| | | | | | |   <| |  |g|i| | \__ \
- \__|_|_| |_| |_|_|\_\_|  |m|l| |_|__*/
+/*|_|_|_ __ _(c)|2| ___ __|_|_ __  ___ 
+| _|| | '_ ` _ \|0|/ / '__|@|a'_ \/ __|
+| |_| | | | | | |1  <| |  |g|i| | \__ \
+ \__|_|_| |_| | |2|\ \ |  |m|l| |_|__*/
 
 // ###################################
 // This is a delta robot simulator.
@@ -35,27 +35,6 @@ int calculate_delta(void);
 
 void draw_text_layers(void);
 void draw_delta_robot(void);
-    void draw_slice(int current_slice);
-        void draw_top(void);
-            void draw_top_trisection(void);
-            void draw_top_squaresection(void);
-        void draw_motor(void);
-        void draw_top_arm(int current_slice);
-        void draw_arm_connector(void);
-        void draw_bottom_arm(int current_slice);
-        void draw_effector_slice(void);
-
-// prototype generic drawing routines. these start at (0,0,0) centered and in the +z.
-
-void draw_sphere(float radius);
-void draw_cuboid(float width, float height, float length);
-void draw_closed_cylinder(float radius, float length);
-void draw_centered_closed_cylinder(float radius, float length);
-
-// prototype generic coloring routines
-
-void color_darken(void);
-
 
 //build structs
 
@@ -256,7 +235,7 @@ int calculate_delta(void) {
 
 THIS CODE WAS ACTUALLY RUBBISH LOL
 
-float t = (robot_top_platform_triangle_radius-robot_bottom_platform_triangle_radius)*tan30/2.0; float dtr = pi/(float)180.0;
+float t = (robot_top_platform_radius-robot_ee_radius)*tan30/2.0; float dtr = pi/(float)180.0;
 float y1 = -(t + robot_top_arm_length*cos(theta1*dtr));float z1 = -robot_top_arm_length*sin(theta1*dtr);
 float y2 = (t + robot_top_arm_length*cos(theta2*dtr))*sin30;float x2 = y2*tan60;
 float z2 = -robot_top_arm_length*sin(theta2*dtr);float y3 = (t + robot_top_arm_length*cos(theta3*dtr))*sin30;
@@ -280,13 +259,13 @@ for (int i=0; i < 3; i++){ // run through each slice
 rotation = i*120;
 
 //these real positions are only used for information.
-base_x[i] = (cos(rotation*pion180)) * ((robot_top_platform_triangle_radius));
-base_y[i] = (sin(rotation*pion180)) * ((robot_top_platform_triangle_radius));
+base_x[i] = (cos(rotation*pion180)) * ((robot_top_platform_radius));
+base_y[i] = (sin(rotation*pion180)) * ((robot_top_platform_radius));
 base_z[i] = 0;
 
 //these are 'fake' positions, used for calculations.
-base_calc_x[i] = (cos(rotation*pion180)) * ((robot_top_platform_triangle_radius-robot_bottom_platform_triangle_radius));
-base_calc_y[i] = (sin(rotation*pion180)) * ((robot_top_platform_triangle_radius-robot_bottom_platform_triangle_radius));
+base_calc_x[i] = (cos(rotation*pion180)) * ((robot_top_platform_radius-robot_ee_radius));
+base_calc_y[i] = (sin(rotation*pion180)) * ((robot_top_platform_radius-robot_ee_radius));
 base_calc_z[i] = 0;
 
 //these are 'fake' positions, used for calculations.
@@ -341,8 +320,8 @@ rotation = i*120;
 //
 // Calculates the real end-effector joint positions, used for calculating the elusive 4th angle.
 //
-eereal_x[i] = ((cos(rotation*(3.1415/180.0)))*(robot_bottom_platform_triangle_radius))+ee[0];
-eereal_y[i] = ((sin(rotation*(3.1415/180.0)))*(robot_bottom_platform_triangle_radius))+ee[1];
+eereal_x[i] = ((cos(rotation*(3.1415/180.0)))*(robot_ee_radius))+ee[0];
+eereal_y[i] = ((sin(rotation*(3.1415/180.0)))*(robot_ee_radius))+ee[1];
 eereal_z[i] = ee[2];
 }
 
@@ -480,14 +459,6 @@ if (theAction == GLFW_PRESS){
   };
 };
 
-void color_darken(void){
-// ###################################
-// Darkens the current drawing colour.
-// ###################################
-glGetFloatv(GL_CURRENT_COLOR, colors);
-glColor3f(colors[0]*0.95f, colors[1]*0.95f, colors[2]*0.95f);
-};
-
 void update_view(void){
 // #############################################################
 // These functions implement the momentum of the camera.
@@ -596,8 +567,8 @@ if(holdingB) {robot_angles[0] = -15;};
 if(holdingN) {robot_angles[1] = -10;};
 if(holdingM) {robot_angles[2] = -5;};
 
-if(holdingZ) {y_view = 0;};
-if(holdingX) {y_view = 0-ee[2];};
+if(holdingZ) {y_view += 0.5;};
+if(holdingX) {y_view -= 0.5;};
 
 // ###################################
 // Calculate the camera's coordinates.
@@ -617,20 +588,16 @@ update_view();
 //view_lookfrom_y -= robot_top_arm_length;
 gluLookAt(view_lookfrom_x, view_lookfrom_y - y_view, view_lookfrom_z,view_lookat_x, view_lookat_y - y_view, view_lookat_z,0.0f, view_orientation, 0.0f);
 
-
 // !!!!!!!!!!!!!!!!!!!!!!
 // Draw all things here.
 // !!!!!!!!!!!!!!!!!!!!!!
 
-
 draw_delta_robot();
 draw_text_layers();
-
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!
 // Stop drawing things here.
 // !!!!!!!!!!!!!!!!!!!!!!!!!
-
 
 };
 
@@ -655,7 +622,6 @@ int main(void){
 // This is the main loop, the entry point of the program.
 // ######################################################
 variables_init();
-vertex_init();
 graphics_init();
 graphics_loop();
 quit();

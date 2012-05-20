@@ -13,3 +13,6 @@
 
 # Compiled executables
 *.exe
+
+# Others
+*-debug.txt

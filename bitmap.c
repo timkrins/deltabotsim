@@ -1,7 +1,7 @@
-/*|_|_|_ __ ___ | | ___ __|_|_ __  ___ 
-| _|| | '_ ` _ \| |/ / '__|@|a'_ \/ __|
-| |_| | | | | | |   <| |  |g|i| | \__ \
- \__|_|_| |_| |_|_|\_\_|  |m|l| |_|__*/
+/*|_|_|_ __ _(c)|2| ___ __|_|_ __  ___ 
+| _|| | '_ ` _ \|0|/ / '__|@|a'_ \/ __|
+| |_| | | | | | |1  <| |  |g|i| | \__ \
+ \__|_|_| |_| | |2|\ \ |  |m|l| |_|__*/
  
 // This is a delta robot simulator.
 // Implements OpenGL, GLFW and GLU.
@@ -9,6 +9,7 @@
 // Use IJOKPL to change the angles.
 
 // set up bitmap font
+// this was borrowed from somewhere, but I want to make my own!
 
 GLubyte bitmap_font[][13] = {
 {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},

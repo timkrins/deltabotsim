@@ -1,4 +1,4 @@
-PROGRAM = sliced
+PROGRAM = deltasim
 
 SOURCES = $(PROGRAM).c
 CC = $(ARCH)gcc

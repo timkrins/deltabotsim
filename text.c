@@ -1,7 +1,7 @@
-/*|_|_|_ __ ___ | | ___ __|_|_ __  ___ 
-| _|| | '_ ` _ \| |/ / '__|@|a'_ \/ __|
-| |_| | | | | | |   <| |  |g|i| | \__ \
- \__|_|_| |_| |_|_|\_\_|  |m|l| |_|__*/
+/*|_|_|_ __ _(c)|2| ___ __|_|_ __  ___ 
+| _|| | '_ ` _ \|0|/ / '__|@|a'_ \/ __|
+| |_| | | | | | |1  <| |  |g|i| | \__ \
+ \__|_|_| |_| | |2|\ \ |  |m|l| |_|__*/
 
 // ###################################
 // This is a delta robot simulator.
@@ -13,6 +13,12 @@
 // set up bitmap font
 
 #include "bitmap.c"
+
+
+#define red glColor3f(0.9, 0.1, 0.1)
+#define green glColor3f(0.1, 0.9, 0.1)
+#define blue glColor3f(0.1, 0.1, 0.9)
+
 
 void makeBitmapFonts(void){
 // ########################
@@ -65,7 +71,7 @@ glRasterPos2f(xpos ,line_pos(pos));   printString(charlies);
 
 char * make_text(float number_float){
 memset(sprinter, 0, sizeof(sprinter));
-sprintf(sprinter, "%.4f", number_float);
+sprintf(sprinter, "%.1f", number_float);
 return sprinter;
 }
 
@@ -78,211 +84,60 @@ glMatrixMode(GL_MODELVIEW);
 glPushMatrix();
 glLoadIdentity();
 
-/*
-At this point, glVerte2i(x,y) or glRasterPos2i(x,y) will set the 
-vertex/raster position to pixel (x,y) on the front plane (as an 
-overlay). When you're done drawing in 2D onto the front plane, you can 
-go back to whereever you were.
-*/
     glColor3f(0.2, 0.9, 0.2);
     left_align_text(0, "OpenGL Delta Robot Simulator");
     
     glColor3f(0.5, 0.9, 0.5);
-    right_align_text(0, "(c) 2012 TimKrins");
-    
-    glColor3f(0.7, 0.3, 0.3);
-    centre_align_text(0, "(W,A,S,D),(Q,E),[I,J],[O,K],[P,L],0,(1,2,3),(4,5,6),(7,8,9)");
+    right_align_text(0, "(c?) 2012 TimKrins. For personal use only.");
     
     int current_line_height = 40;
     
     char text_str[50];
         
     glColor3f(0.8, 0.8, 0.8);
-    right_align_text(current_line_height--, "First Angles:");
-    glColor3f(0.1, 0.9, 0.1);
+    right_align_text(current_line_height--, "Motor Angles:");
     memset(text_str, 0, sizeof(text_str));
 
+    red;
     strcat(text_str,"One ");
     strcat(text_str, make_text(robot_angles[0]));
     strcat(text_str," degrees.");
     right_align_text(current_line_height--, text_str);
     memset(text_str, 0, sizeof(text_str));
     
-    glColor3f(0.1, 0.1, 0.9);
+    green;
     strcat(text_str,"Two ");
     strcat(text_str, make_text(robot_angles[1]));
     strcat(text_str," degrees.");
     right_align_text(current_line_height--, text_str);
     memset(text_str, 0, sizeof(text_str));
     
-    glColor3f(0.9, 0.1, 0.1);
+    blue;
     strcat(text_str,"Three ");
     strcat(text_str, make_text(robot_angles[2]));
     strcat(text_str," degrees.");
     right_align_text(current_line_height--, text_str);
     memset(text_str, 0, sizeof(text_str));
     
-    current_line_height--;
-    /*
+    current_line_height = 15;
+    
     glColor3f(0.8, 0.8, 0.8);
-    right_align_text(current_line_height--, "Second Angles:");
-    glColor3f(0.1, 0.9, 0.1);
-
-    strcat(text_str,"One ");
-    strcat(text_str, make_text(robot_arm_first_angles[0]));
-    strcat(text_str," degrees.");
-    right_align_text(current_line_height--, text_str);
-    memset(text_str, 0, sizeof(text_str));
-    
-    glColor3f(0.1, 0.1, 0.9);
-    strcat(text_str,"Two ");
-    strcat(text_str, make_text(robot_arm_first_angles[1]));
-    strcat(text_str," degrees.");
-    right_align_text(current_line_height--, text_str);
-    memset(text_str, 0, sizeof(text_str));
-    
-    glColor3f(0.9, 0.1, 0.1);
-    strcat(text_str,"Three ");
-    strcat(text_str, make_text(robot_arm_first_angles[2]));
-    strcat(text_str," degrees.");
-    right_align_text(current_line_height--, text_str);
-    memset(text_str, 0, sizeof(text_str));
+    right_align_text(current_line_height--, "[W,A,S,D] to orbit");
+    right_align_text(current_line_height--, "[Q,E] to zoom");
+    right_align_text(current_line_height--, "[Z,X] to change vertical orbit position");
+    current_line_height--;
+    right_align_text(current_line_height--, "[I,J] [O,K] [P,L] to adjust angles");
+    current_line_height--;
+    right_align_text(current_line_height--, "[0] to reset angles");
+    right_align_text(current_line_height--, "[1,2,3] set to 70degrees");
+    right_align_text(current_line_height--, "[4,5,6] set to 45degrees");
+    right_align_text(current_line_height--, "[7,8,9] set to -50degrees");
     
     current_line_height--;
-    
-    glColor3f(0.8, 0.8, 0.8);
-    right_align_text(current_line_height--, "Third Angles:");
-    glColor3f(0.1, 0.9, 0.1);
-
-    strcat(text_str,"One ");
-    strcat(text_str, make_text(robot_arm_second_angles[0]));
-    strcat(text_str," degrees.");
-    right_align_text(current_line_height--, text_str);
-    memset(text_str, 0, sizeof(text_str));
-    
-    glColor3f(0.1, 0.1, 0.9);
-    strcat(text_str,"Two ");
-    strcat(text_str, make_text(robot_arm_second_angles[1]));
-    strcat(text_str," degrees.");
-    right_align_text(current_line_height--, text_str);
-    memset(text_str, 0, sizeof(text_str));
-    
-    glColor3f(0.9, 0.1, 0.1);
-    strcat(text_str,"Three ");
-    strcat(text_str, make_text(robot_arm_second_angles[2]));
-    strcat(text_str," degrees.");
-    right_align_text(current_line_height--, text_str);
-    memset(text_str, 0, sizeof(text_str));
-    
-        current_line_height--;
-    
-    glColor3f(0.8, 0.8, 0.8);
-    right_align_text(current_line_height--, "Fourth Angles:");
-    glColor3f(0.1, 0.9, 0.1);
-
-    strcat(text_str,"One ");
-    strcat(text_str, make_text(robot_fourth_angles[0]));
-    strcat(text_str," degrees.");
-    right_align_text(current_line_height--, text_str);
-    memset(text_str, 0, sizeof(text_str));
-    
-    glColor3f(0.1, 0.1, 0.9);
-    strcat(text_str,"Two ");
-    strcat(text_str, make_text(robot_fourth_angles[1]));
-    strcat(text_str," degrees.");
-    right_align_text(current_line_height--, text_str);
-    memset(text_str, 0, sizeof(text_str));
-    
-    glColor3f(0.9, 0.1, 0.1);
-    strcat(text_str,"Three ");
-    strcat(text_str, make_text(robot_fourth_angles[2]));
-    strcat(text_str," degrees.");
-    right_align_text(current_line_height--, text_str);
-    memset(text_str, 0, sizeof(text_str));
-    
-    current_line_height--;
-    glColor3f(0.8, 0.8, 0.8);
-    strcat(text_str,"Frames Drawn: ");
-    strcat(text_str, make_text(frame));
-    right_align_text(current_line_height--, text_str);
-    memset(text_str, 0, sizeof(text_str));
-    */
+    right_align_text(current_line_height--, ":D Enjoy!");
+ 
     current_line_height = 40;
     
-    glColor3f(0.8, 0.8, 0.8);
-    left_align_text(current_line_height--, "'Fake' Joint Positions:");
-    
-    glColor3f(0.1, 0.9, 0.1);
-    strcat(text_str,"J (");
-    strcat(text_str, make_text(j_x[0]));
-    strcat(text_str,",");
-    strcat(text_str, make_text(j_y[0]));
-    strcat(text_str,",");
-    strcat(text_str, make_text(j_z[0]));
-    strcat(text_str,") mm");
-    left_align_text(current_line_height--, text_str);
-    memset(text_str, 0, sizeof(text_str));
-    
-    glColor3f(0.1, 0.1, 0.9);
-    strcat(text_str,"J (");
-    strcat(text_str, make_text(j_x[1]));
-    strcat(text_str,",");
-    strcat(text_str, make_text(j_y[1]));
-    strcat(text_str,",");
-    strcat(text_str, make_text(j_z[1]));
-    strcat(text_str,") mm");
-    left_align_text(current_line_height--, text_str);
-    memset(text_str, 0, sizeof(text_str));
-    
-    glColor3f(0.9, 0.1, 0.1);
-    strcat(text_str,"J (");
-    strcat(text_str, make_text(j_x[2]));
-    strcat(text_str,",");
-    strcat(text_str, make_text(j_y[2]));
-    strcat(text_str,",");
-    strcat(text_str, make_text(j_z[2]));
-    strcat(text_str,") mm");
-    left_align_text(current_line_height--, text_str);
-    memset(text_str, 0, sizeof(text_str));
-    
-    current_line_height--;
-    glColor3f(0.8, 0.8, 0.8);
-    left_align_text(current_line_height--, "'Fake' Base Positions:");
-    
-    glColor3f(0.1, 0.9, 0.1);
-    strcat(text_str,"J (");
-    strcat(text_str, make_text(base_calc_x[0]));
-    strcat(text_str,",");
-    strcat(text_str, make_text(base_calc_y[0]));
-    strcat(text_str,",");
-    strcat(text_str, make_text(base_calc_z[0]));
-    strcat(text_str,") mm");
-    left_align_text(current_line_height--, text_str);
-    memset(text_str, 0, sizeof(text_str));
-    
-    glColor3f(0.1, 0.1, 0.9);
-    strcat(text_str,"J (");
-    strcat(text_str, make_text(base_calc_x[1]));
-    strcat(text_str,",");
-    strcat(text_str, make_text(base_calc_y[1]));
-    strcat(text_str,",");
-    strcat(text_str, make_text(base_calc_z[1]));
-    strcat(text_str,") mm");
-    left_align_text(current_line_height--, text_str);
-    memset(text_str, 0, sizeof(text_str));
-    
-    glColor3f(0.9, 0.1, 0.1);
-    strcat(text_str,"J (");
-    strcat(text_str, make_text(base_calc_x[2]));
-    strcat(text_str,",");
-    strcat(text_str, make_text(base_calc_y[2]));
-    strcat(text_str,",");
-    strcat(text_str, make_text(base_calc_z[2]));
-    strcat(text_str,") mm");
-    left_align_text(current_line_height--, text_str);
-    memset(text_str, 0, sizeof(text_str));
-    
-    current_line_height--;
     glColor3f(0.8, 0.8, 0.8);
     left_align_text(current_line_height--, "End Effector Position:");
     
@@ -297,49 +152,11 @@ go back to whereever you were.
     left_align_text(current_line_height--, text_str);
     memset(text_str, 0, sizeof(text_str));
     
-    
-    current_line_height--;
-        glColor3f(0.8, 0.8, 0.8);
-    left_align_text(current_line_height--, "Real Joint Positions:");
-    
-    glColor3f(0.1, 0.9, 0.1);
-    strcat(text_str,"J (");
-    strcat(text_str, make_text(j_real_x[0]));
-    strcat(text_str,",");
-    strcat(text_str, make_text(j_real_y[0]));
-    strcat(text_str,",");
-    strcat(text_str, make_text(j_real_z[0]));
-    strcat(text_str,") mm");
-    left_align_text(current_line_height--, text_str);
-    memset(text_str, 0, sizeof(text_str));
-    
-    glColor3f(0.1, 0.1, 0.9);
-    strcat(text_str,"J (");
-    strcat(text_str, make_text(j_real_x[1]));
-    strcat(text_str,",");
-    strcat(text_str, make_text(j_real_y[1]));
-    strcat(text_str,",");
-    strcat(text_str, make_text(j_real_z[1]));
-    strcat(text_str,") mm");
-    left_align_text(current_line_height--, text_str);
-    memset(text_str, 0, sizeof(text_str));
-    
-    glColor3f(0.9, 0.1, 0.1);
-    strcat(text_str,"J (");
-    strcat(text_str, make_text(j_real_x[2]));
-    strcat(text_str,",");
-    strcat(text_str, make_text(j_real_y[2]));
-    strcat(text_str,",");
-    strcat(text_str, make_text(j_real_z[2]));
-    strcat(text_str,") mm");
-    left_align_text(current_line_height--, text_str);
-    memset(text_str, 0, sizeof(text_str));
-    
         current_line_height--;
     glColor3f(0.8, 0.8, 0.8);
-    left_align_text(current_line_height--, "Real Base Positions:");
+    left_align_text(current_line_height--, "Base Joint Positions:");
     
-    glColor3f(0.1, 0.9, 0.1);
+    red;
     strcat(text_str,"J (");
     strcat(text_str, make_text(base_x[0]));
     strcat(text_str,",");
@@ -350,7 +167,7 @@ go back to whereever you were.
     left_align_text(current_line_height--, text_str);
     memset(text_str, 0, sizeof(text_str));
     
-    glColor3f(0.1, 0.1, 0.9);
+    green;
     strcat(text_str,"J (");
     strcat(text_str, make_text(base_x[1]));
     strcat(text_str,",");
@@ -361,7 +178,7 @@ go back to whereever you were.
     left_align_text(current_line_height--, text_str);
     memset(text_str, 0, sizeof(text_str));
     
-    glColor3f(0.9, 0.1, 0.1);
+    blue;
     strcat(text_str,"J (");
     strcat(text_str, make_text(base_x[2]));
     strcat(text_str,",");
@@ -372,11 +189,48 @@ go back to whereever you were.
     left_align_text(current_line_height--, text_str);
     memset(text_str, 0, sizeof(text_str));
     
-            current_line_height--;
+    current_line_height--;
     glColor3f(0.8, 0.8, 0.8);
-    left_align_text(current_line_height--, "End Effector Real Base Positions:");
+    left_align_text(current_line_height--, "Arm Joint Positions:");
     
-    glColor3f(0.1, 0.9, 0.1);
+    red;
+    strcat(text_str,"J (");
+    strcat(text_str, make_text(j_real_x[0]));
+    strcat(text_str,",");
+    strcat(text_str, make_text(j_real_y[0]));
+    strcat(text_str,",");
+    strcat(text_str, make_text(j_real_z[0]));
+    strcat(text_str,") mm");
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    green;
+    strcat(text_str,"J (");
+    strcat(text_str, make_text(j_real_x[1]));
+    strcat(text_str,",");
+    strcat(text_str, make_text(j_real_y[1]));
+    strcat(text_str,",");
+    strcat(text_str, make_text(j_real_z[1]));
+    strcat(text_str,") mm");
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    blue;
+    strcat(text_str,"J (");
+    strcat(text_str, make_text(j_real_x[2]));
+    strcat(text_str,",");
+    strcat(text_str, make_text(j_real_y[2]));
+    strcat(text_str,",");
+    strcat(text_str, make_text(j_real_z[2]));
+    strcat(text_str,") mm");
+    left_align_text(current_line_height--, text_str);
+    memset(text_str, 0, sizeof(text_str));
+    
+    current_line_height--;
+    glColor3f(0.8, 0.8, 0.8);
+    left_align_text(current_line_height--, "End Effector Joint Positions:");
+    
+    red;
     strcat(text_str,"J (");
     strcat(text_str, make_text(eereal_x[0]));
     strcat(text_str,",");
@@ -387,7 +241,7 @@ go back to whereever you were.
     left_align_text(current_line_height--, text_str);
     memset(text_str, 0, sizeof(text_str));
     
-    glColor3f(0.1, 0.1, 0.9);
+    green;
     strcat(text_str,"J (");
     strcat(text_str, make_text(eereal_x[1]));
     strcat(text_str,",");
@@ -398,7 +252,7 @@ go back to whereever you were.
     left_align_text(current_line_height--, text_str);
     memset(text_str, 0, sizeof(text_str));
     
-    glColor3f(0.9, 0.1, 0.1);
+    blue;
     strcat(text_str,"J (");
     strcat(text_str, make_text(eereal_x[2]));
     strcat(text_str,",");
@@ -408,6 +262,17 @@ go back to whereever you were.
     strcat(text_str,") mm");
     left_align_text(current_line_height--, text_str);
     memset(text_str, 0, sizeof(text_str));
+    
+    current_line_height--;
+    glColor3f(0.8, 0.8, 0.8);
+    left_align_text(current_line_height--, "All these values are rounded");
+    left_align_text(current_line_height--, "to 2 decimal places");
+    left_align_text(current_line_height--, "but you can change it in code");
+    
+    current_line_height--;
+    left_align_text(current_line_height--, "You should visually check");
+    left_align_text(current_line_height--, "for collisions; this code does");
+    left_align_text(current_line_height--, "not test for impossible positions.");
     
     
 glMatrixMode(GL_PROJECTION);
