@@ -88,9 +88,9 @@ glPopMatrix(); // end of joint and motor.
 
 glRotated(angle,t.x,t.y,t.z);
 
-glTranslated(3,0,0);
+glTranslated(robot_top_platform_radius/5,0,0);
 grey(0.3);
-draw_closed_cylinder(robot_top_arm_radius,15);
+draw_closed_cylinder(robot_top_arm_radius,robot_top_platform_radius*1.35);
 
 glPopMatrix();
 }

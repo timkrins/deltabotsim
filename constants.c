@@ -73,7 +73,7 @@ float robot_bottom_arm_radius = 1.0f;
 float robot_ee_radius = 5.0f;
 float robot_ee_thickness = 0.5f;
 
-float robot_angles[] = { 0.0f, 0.0f, 0.0f };
+float robot_angles[] = { 10.0f, 10.0f, 10.0f };
 
 //float multi = 1.0f;
 float y_view = 10;
