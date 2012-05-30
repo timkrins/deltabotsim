@@ -1,13 +1,14 @@
-/*|_|_|_ __ _(c)|2| ___ __|_|_ __  ___ 
+/*|_|_|_ __ _(c)|2| ___ __|_|_ __  ___
 | _|| | '_ ` _ \|0|/ / '__|@|a'_ \/ __|
 | |_| | | | | | |1  <| |  |g|i| | \__ \
  \__|_|_| |_| | |2|\ \ |  |m|l| |_|__*/
- 
+
 // This is a delta robot simulator.
 // Implements OpenGL, GLFW and GLU.
 // Use the controls WASDQE for viewpoint.
 // Use IJOKPL to change the angles.
 
+#include <GL/glu.h>
 
 //  define window constants
 
@@ -33,8 +34,8 @@ GLint fontOffset;
 
 float sqrt3;
 float pi;
-float sin120;   
-float cos120;        
+float sin120;
+float cos120;
 float tan60;
 float sin30;
 float tan30;
@@ -134,8 +135,8 @@ void variables_init(void){
 // #######################################################
 sqrt3 = sqrt(3.0);
 pi = 3.141592653;
-sin120 = sqrt3/2.0;   
-cos120 = -0.5;        
+sin120 = sqrt3/2.0;
+cos120 = -0.5;
 tan60 = sqrt3;
 sin30 = 0.5;
 tan30 = 1/sqrt3;

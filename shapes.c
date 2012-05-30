@@ -1,4 +1,4 @@
-/*|_|_|_ __ _(c)|2| ___ __|_|_ __  ___ 
+/*|_|_|_ __ _(c)|2| ___ __|_|_ __  ___
 | _|| | '_ ` _ \|0|/ / '__|@|a'_ \/ __|
 | |_| | | | | | |1  <| |  |g|i| | \__ \
  \__|_|_| |_| | |2|\ \ |  |m|l| |_|__*/
@@ -34,10 +34,9 @@ void draw_closed_cylinder(float radius, float length){
 // Draws a closed cylinder from [zero] extending [length]
 // ###################################
 glPushMatrix();
+gluDisk(quadDisk, 0, radius, 32, 1);
 color_darken();
 gluCylinder(quadCylinder, radius, radius, length, 32, 16);
-color_darken();
-gluDisk(quadDisk, 0, radius, 32, 1);
 glTranslatef(0,0,length);
 color_darken();
 gluDisk(quadDisk, 0, radius, 32, 1);

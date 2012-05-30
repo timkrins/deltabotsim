@@ -1,4 +1,4 @@
-/*|_|_|_ __ _(c)|2| ___ __|_|_ __  ___ 
+/*|_|_|_ __ _(c)|2| ___ __|_|_ __  ___
 | _|| | '_ ` _ \|0|/ / '__|@|a'_ \/ __|
 | |_| | | | | | |1  <| |  |g|i| | \__ \
  \__|_|_| |_| | |2|\ \ |  |m|l| |_|__*/
@@ -62,7 +62,7 @@ vec3d vdiff(const vec3d vector1, const vec3d vector2){
         v.z = vector1.z - vector2.z;
         return v;
 }
- 
+
 
 vec3d vsum(const vec3d vector1, const vec3d vector2){
 /* Return the sum of two vectors. */
@@ -72,7 +72,7 @@ vec3d vsum(const vec3d vector1, const vec3d vector2){
         v.z = vector1.z + vector2.z;
         return v;
 }
- 
+
 
 vec3d vmul(const vec3d vector, const double n){
 /* Multiply vector by a number. */
@@ -82,7 +82,7 @@ vec3d vmul(const vec3d vector, const double n){
         v.z = vector.z * n;
         return v;
 }
- 
+
 
 vec3d vdiv(const vec3d vector, const double n){
 /* Divide vector by a number. */
@@ -92,17 +92,17 @@ vec3d vdiv(const vec3d vector, const double n){
         v.z = vector.z / n;
         return v;
 }
- 
+
 double vnorm(const vec3d vector){
 /* Return the Euclidean norm. */
         return sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z);
 }
- 
+
 double dot(const vec3d vector1, const vec3d vector2){
 /* Return the dot product of two vectors. */
         return vector1.x * vector2.x + vector1.y * vector2.y + vector1.z * vector2.z;
 }
- 
+
 
 vec3d cross(const vec3d vector1, const vec3d vector2){
 /* Replace vector with its cross product with another vector. */
@@ -122,10 +122,10 @@ int trilateration(vec3d *const result1, vec3d *const result2,
  * The last parameter is the largest nonnegative number considered zero;
  * it is somewhat analoguous to machine epsilon (but inclusive).
 */
-                  
+
         vec3d   ex, ey, ez, t1, t2;
         double  h, i, j, x, y, z, t;
- 
+
         /* h = |p2 - p1|, ex = (p2 - p1) / |p2 - p1| */
         ex = vdiff(p2, p1);
         h = vnorm(ex);
@@ -134,28 +134,28 @@ int trilateration(vec3d *const result1, vec3d *const result2,
                 return -1;
         }
         ex = vdiv(ex, h);
- 
+
         /* t1 = p3 - p1, t2 = ex (ex . (p3 - p1)) */
         t1 = vdiff(p3, p1);
         i = dot(ex, t1);
         t2 = vmul(ex, i);
- 
+
         /* ey = (t1 - t2), t = |t1 - t2| */
         ey = vdiff(t1, t2);
         t = vnorm(ey);
         if (t > maxzero) {
                 /* ey = (t1 - t2) / |t1 - t2| */
                 ey = vdiv(ey, t);
- 
+
                 /* j = ey . (p3 - p1) */
                 j = dot(ey, t1);
         } else
                 j = 0.0;
- 
+
         /* Note: t <= maxzero implies j = 0.0. */
         if (fabs(j) <= maxzero) {
                 /* p1, p2 and p3 are colinear. */
- 
+
                 /* Is point p1 + (r1 along the axis) the intersection? */
                 t2 = vsum(p1, vmul(ex, r1));
                 if (fabs(vnorm(vdiff(p2, t2)) - r2) <= maxzero &&
@@ -167,7 +167,7 @@ int trilateration(vec3d *const result1, vec3d *const result2,
                                 *result2 = t2;
                         return 0;
                 }
- 
+
                 /* Is point p1 - (r1 along the axis) the intersection? */
                 t2 = vsum(p1, vmul(ex, -r1));
                 if (fabs(vnorm(vdiff(p2, t2)) - r2) <= maxzero &&
@@ -179,13 +179,13 @@ int trilateration(vec3d *const result1, vec3d *const result2,
                                 *result2 = t2;
                         return 0;
                 }
- 
+
                 return -2;
         }
- 
+
         /* ez = ex x ey */
         ez = cross(ex, ey);
- 
+
         x = (r1*r1 - r2*r2) / (2*h) + h / 2;
         y = (r1*r1 - r3*r3 + i*i) / (2*j) + j / 2 - x * i / j;
         z = r1*r1 - x*x - y*y;
@@ -197,29 +197,29 @@ int trilateration(vec3d *const result1, vec3d *const result2,
                 z = sqrt(z);
         else
                 z = 0.0;
- 
+
         /* t2 = p1 + x ex + y ey */
         t2 = vsum(p1, vmul(ex, x));
         t2 = vsum(t2, vmul(ey, y));
- 
+
         /* result1 = p1 + x ex + y ey + z ez */
         if (result1)
                 *result1 = vsum(t2, vmul(ez, z));
- 
+
         /* result1 = p1 + x ex + y ey - z ez */
         if (result2)
                 *result2 = vsum(t2, vmul(ez, -z));
- 
+
         return 0;
 }
 
 vec3d   o1, o2;
 
-int calculate_vectors(vec3d p1, vec3d p2, vec3d p3, double r1, double r2, double r3){
+void calculate_vectors(vec3d p1, vec3d p2, vec3d p3, double r1, double r2, double r3){
         int     result;
                 result = trilateration(&o1, &o2, p1, r1, p2, r2, p3, r3, MAXZERO);
                 if (result){
-                        printf("No solution. Please check your robot dimensions.\n", result);
+                        printf("No solution. Please check your robot dimensions.\n");
                         quit();
                 };
 };
@@ -255,7 +255,8 @@ float yval0 = (a2*zval0 + b2)/dnm;
 // ########################################################################
 // Calculate the values for the base, base_xyz, the joint positions, j_xyz.
 // ########################################################################
-for (int i=0; i < 3; i++){ // run through each slice
+int i;
+for (i=0; i < 3; i++){ // run through each slice
 rotation = i*120;
 
 //these real positions are only used for information.
@@ -314,7 +315,7 @@ ee[1] = o2.y;
 ee[2] = o2.z;
 }
 
-for (int i=0; i < 3; i++){
+for (i=0; i < 3; i++){
 rotation = i*120;
 
 //
@@ -327,7 +328,7 @@ eereal_z[i] = ee[2];
 
 return 0;
 };
- 
+
 void quit(void){
 // #####################
 // Quits the application
@@ -412,7 +413,7 @@ if (theAction == GLFW_PRESS){
     case '8': holding8 = 1; break;
     case '9': holding9 = 1; break;
     case '0': holding0 = 1; break;
-    
+
     default: break;
     }
   } else {
@@ -453,7 +454,7 @@ if (theAction == GLFW_PRESS){
     case '8': holding8 = 0; break;
     case '9': holding9 = 0; break;
     case '0': holding0 = 0; break;
-    
+
     default: break;
     };
   };
@@ -488,11 +489,11 @@ if((view_momentum_z > 0.01)||(view_momentum_z < -0.01)) {
 } else {
   view_momentum_z = 0.0;
 };
-    
+
 // ##########################
 // Don't get too close now...
 // ##########################
-    
+
 if(view_distance_from_model < 10){
   view_momentum_z = 0;
   view_distance_from_model = 10;
@@ -506,7 +507,7 @@ if(holdingS) { view_momentum_y += 0.1; };
 if(holdingW) { view_momentum_y -= 0.1; };
 if(holdingQ) { view_momentum_z +=0.1; };
 if(holdingE) { view_momentum_z -=0.1; };
-    
+
 // ##########################################################
 // This code here flips the up direction so the model doesn't
 // spaz out when you pass directly over it.
@@ -533,7 +534,7 @@ if(view_lookfrom_x_linear > 180){
     view_lookfrom_x_linear = 179.9;
   };
 };
-   
+
 // #############################
 // Changes the angles with keys.
 // #############################
@@ -625,6 +626,7 @@ variables_init();
 graphics_init();
 graphics_loop();
 quit();
+return 0;
 };
 
 
