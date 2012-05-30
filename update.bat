@@ -1,0 +1,1 @@
+copy .\bin\Debug\%1.exe D:\new\%1.exe
